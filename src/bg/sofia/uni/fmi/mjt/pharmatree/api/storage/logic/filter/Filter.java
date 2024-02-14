@@ -8,5 +8,5 @@ import java.util.stream.Stream;
 public interface Filter<E> {
     Stream<E> filterStreamByParams(Stream<E> stream, Map<String, List<String>> params);
 
-    Optional<E> getElement(Stream<E> stream, E element);
+    Optional<E> getElementById(Stream<E> stream, int id);
 }

@@ -3,14 +3,11 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property;
 
 // TODO: Flyweight
 
-import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Item;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Copyable;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
 
-public class Property extends Item implements Copyable<Property> {
+public class Property implements Copyable<Property> {
     private String name;
     private String description;
     private List<String> allergies;

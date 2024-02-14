@@ -7,22 +7,26 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.ItemsType;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 
 public interface Handler {
+    String ACCEPT = "OK";
+    int ACCEPT_CODE = 200;
     int POS_OF_TYPE = 1;
     int COUNT_OF_PARTS = 3;
     String SEPARATOR = "/";
-    Gson gson = new Gson();
-    static Type getType(HttpExchange exchange) {
+    static String getType(HttpExchange exchange) {
         String path = exchange.getRequestURI().getPath();
         String[] arr = path.split(SEPARATOR, COUNT_OF_PARTS);
-        return switch (ItemsType.parseFromString(arr[POS_OF_TYPE])) {
-            case User -> User.class;
-            case Property -> Property.class;
-            case Drug -> Drug.class;
-            case null -> throw new IllegalArgumentException("Invalid type of Object: " + arr[POS_OF_TYPE]);
-        };
+        return arr[POS_OF_TYPE];
+    }
+
+    static void writeResponse(HttpExchange exchange, int code, String text) throws IOException {
+        exchange.sendResponseHeaders(code, text.getBytes(StandardCharsets.UTF_8).length);
+        exchange.getResponseBody().write(text.getBytes(StandardCharsets.UTF_8));
+        exchange.getResponseBody().close();
     }
 
     void execute(HttpExchange exchange);

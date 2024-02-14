@@ -4,17 +4,17 @@ import java.util.List;
 import java.util.Map;
 
 public sealed interface Storage<E> permits BaseStorage {
-    void edit(E element, Map<String, List<String>> edit);
+    void edit(int id, Map<String, List<String>> edit);
 
-    void replace(E oldElem, E newElem);
+    void replaceOrAdd(int id, String json);
 
-    boolean isExist(E element);
+    void replace(int id, String json);
 
-    List<E> get(Map<String, List<String>> params);
+    String get(Map<String, List<String>> params);
 
-    void delete(E element);
+    void delete(int id);
 
-    void add(E element);
+    void add(String element);
 
     void flush();
 }

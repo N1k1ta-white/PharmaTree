@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 public class DrugFilter implements Filter<Drug> {
     private Stream<Drug> filterStreamByParam(Stream<Drug> stream, Map.Entry<String, List<String>> param) {
         return switch (DrugParameters.parseParameterFromString(param.getKey())) {
+            case Id -> stream.filter(elem -> param.getValue().stream()
+                    .map(Integer::parseInt).toList().contains(elem.id()));
             case Name -> stream.filter(elem -> param.getValue().contains(elem.name()));
             case Company -> stream.filter(elem -> param.getValue().contains(elem.company()));
             case Country -> stream.filter(elem -> param.getValue().contains(elem.country()));
@@ -31,7 +33,7 @@ public class DrugFilter implements Filter<Drug> {
     }
 
     @Override
-    public Optional<Drug> getElement(Stream<Drug> stream, Drug element) {
-        return stream.parallel().filter(el -> el.equals(element)).findAny();
+    public Optional<Drug> getElementById(Stream<Drug> stream, int id) {
+        return stream.parallel().filter(el -> el.id() == id).findAny();
     }
 }

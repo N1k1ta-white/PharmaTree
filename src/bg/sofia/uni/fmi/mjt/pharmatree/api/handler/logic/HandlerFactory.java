@@ -2,13 +2,12 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic;
 
 public class HandlerFactory {
     public static Handler of(String method) {
-        return switch (method) {
-            case "GET" -> new GetHandler();
-            case "POST" -> new PostHandler();
-            case "PUT" -> new PutHandler();
-            case "DELETE" -> new DeleteHandler();
-            case "PATCH" -> new PatchHandler();
-            default -> throw new IllegalStateException("Unexpected value: " + method);
+        return switch (TypeHandler.parseMethodType(method)) {
+            case Get -> new GetHandler();
+            case Post -> new PostHandler();
+            case Put -> new PutHandler();
+            case Delete -> new DeleteHandler();
+            case Patch -> new PatchHandler();
         };
     }
 }

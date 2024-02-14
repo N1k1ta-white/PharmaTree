@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 public enum DrugParameters {
+    Id("id"),
     Name("name"),
     Company("company"),
     Country("country"),

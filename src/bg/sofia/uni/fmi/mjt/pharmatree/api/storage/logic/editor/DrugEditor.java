@@ -13,7 +13,7 @@ public class DrugEditor implements Editor<Drug> {
     private boolean isValidNumberOfValues(Map<String, List<String>> params) {
         for (Map.Entry<String, List<String>> param : params.entrySet()) {
             boolean curr = switch (DrugParameters.parseParameterFromString(param.getKey())) {
-                case Name, Company, Country, Weight, Cost -> param.getValue().size() == 1;
+                case Name, Company, Country, Weight, Cost, Id -> param.getValue().size() == 1;
                 case Properties -> !param.getValue().isEmpty();
             };
             if (!curr) {
@@ -27,22 +27,8 @@ public class DrugEditor implements Editor<Drug> {
         return params.keySet().size() == COUNT && isValidNumberOfValues(params);
     }
 
-//    @Override
-//    public Drug createElementByDescription(Map<String, List<String>> params) {
-//        if (isValidDescription(params)) {
-//            return new Drug(params.get(DrugParameters.Name.getString()).getFirst(),
-//                    params.get(DrugParameters.Company.getString()).getFirst(),
-//                    params.get(DrugParameters.Country.getString()).getFirst(),
-//                    params.get(DrugParameters.Properties.getString()),
-//                    Double.parseDouble(params.get(DrugParameters.Cost.getString()).getFirst()),
-//                    Double.parseDouble(params.get(DrugParameters.Weight.getString()).getFirst())
-//                    );
-//        }
-//        throw new IllegalArgumentException("Not valid parameters for new Drug!");
-//    }
-
     @Override
-    public Drug editElement(Drug element, Map<String, List<String>> params) {
+    public void editElement(Drug element, Map<String, List<String>> params) {
         if (isValidNumberOfValues(params)) {
             for (Map.Entry<String, List<String>> param : params.entrySet()) {
                 switch (DrugParameters.parseParameterFromString(param.getKey())) {
@@ -52,6 +38,7 @@ public class DrugEditor implements Editor<Drug> {
                     case Properties -> element.setProperties(param.getValue());
                     case Weight -> element.setWeight(Double.parseDouble(param.getValue().getFirst()));
                     case Cost -> element.setCost(Double.parseDouble(param.getValue().getFirst()));
+                    case Id -> throw new //TODO exception;
                 }
             }
         }

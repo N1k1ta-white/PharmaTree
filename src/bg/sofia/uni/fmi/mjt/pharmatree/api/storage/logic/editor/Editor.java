@@ -4,9 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface Editor<E> {
-//    boolean isValidDescription(Map<String, List<String>> params);
+    // boolean isValidDescription(Map<String, List<String>> params);
 
-    E editElement(E element, Map<String, List<String>> params);
+    void editElement(E element, Map<String, List<String>> params);
 
-//    E createElementByDescription(Map<String, List<String>> params);
 }

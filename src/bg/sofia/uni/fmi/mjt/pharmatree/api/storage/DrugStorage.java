@@ -1,7 +1,7 @@
 package bg.sofia.uni.fmi.mjt.pharmatree.api.storage;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Drug;
-import bg.sofia.uni.fmi.mjt.pharmatree.api.items.parser.DrugParser;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.parser.DrugConverter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.DrugEditor;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.DrugFilter;
 
@@ -18,7 +18,7 @@ public final class DrugStorage extends BaseStorage<Drug> {
     }
 
     private DrugStorage() {
-        super(new CopyOnWriteArrayList<>(), new DrugFilter(), new DrugEditor(), new DrugParser(), PATH_TO_DB);
+        super(new CopyOnWriteArrayList<>(), new DrugFilter(), new DrugEditor(), new DrugConverter(), PATH_TO_DB);
         instance = this;
     }
 
