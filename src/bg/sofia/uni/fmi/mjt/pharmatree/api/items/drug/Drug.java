@@ -1,26 +1,20 @@
 package bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug;
 
-import com.google.gson.annotations.SerializedName;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
 
 import java.util.List;
 import java.util.Objects;
 
-public class Drug implements Copyable<Drug> {
+public class Drug implements Copyable<Drug>, Identifiable {
     private static final String SEPARATOR = ";";
     private static final String SEPARATOR_ARRAY = ",";
-//    @SerializedName("name")
     private String name;
-//    @SerializedName("company")
     private String company;
-//    @SerializedName("country")
     private String country;
-//    @SerializedName("properties")
     private List<String> properties;
-//    @SerializedName("cost")
     private double cost;
-//    @SerializedName("weight")
     private double weight;
-//    @SerializedName("id")
     private int id;
 
     public Drug(int id, String name, String company, String country, List<String> properties, double cost,
@@ -68,8 +62,9 @@ public class Drug implements Copyable<Drug> {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    @Override
+    public void setId(int newId) {
+        id = newId;
     }
 
     public String name() {

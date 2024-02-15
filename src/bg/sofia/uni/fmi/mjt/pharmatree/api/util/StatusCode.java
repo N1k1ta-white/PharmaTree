@@ -5,6 +5,7 @@ public enum StatusCode {
     Unauthorized(401, "Unauthorized"),
     Forbidden(403, "Forbidden"),
     Not_Found(404, "Not Found"),
+    Conflict(409, "Conflict"),
     Created(201, "Created"),
     OK(200, "OK"),
     Internal_Server_Error(500, "Internal Server Error"),

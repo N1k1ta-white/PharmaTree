@@ -2,6 +2,7 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -30,5 +31,5 @@ public interface Handler {
         exchange.getResponseBody().close();
     }
 
-    void execute(HttpExchange exchange) throws ServerException, ClientException;
+    void execute(HttpExchange exchange, Role auth) throws ServerException, ClientException;
 }

@@ -2,6 +2,7 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.handler;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.authentication.Authentication;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.Handler;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.HandlerFactory;
 import com.sun.net.httpserver.HttpExchange;
@@ -24,7 +25,7 @@ public class RequestHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         try {
             Handler handler = HandlerFactory.of(exchange.getRequestMethod());
-            handler.execute(exchange);
+            handler.execute(exchange, Authentication.auth(exchange));
         } catch (ClientException e) {
             Handler.writeResponse(exchange, e.getCode());
         } catch (ServerException e) {

@@ -2,7 +2,8 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.storage;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Drug;
-import bg.sofia.uni.fmi.mjt.pharmatree.api.items.parser.DrugConverter;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.converter.DrugConverter;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.DrugEditor;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.DrugFilter;
 
@@ -28,5 +29,15 @@ public final class DrugStorage extends BaseStorage<Drug> {
             return new DrugStorage();
         }
         return instance;
+    }
+
+    @Override
+    public int getSecurityLevelEdit() {
+        return Role.Admin.getSecurityLevel();
+    }
+
+    @Override
+    public int getSecurityLevelRead() {
+        return Role.Registered.getSecurityLevel();
     }
 }

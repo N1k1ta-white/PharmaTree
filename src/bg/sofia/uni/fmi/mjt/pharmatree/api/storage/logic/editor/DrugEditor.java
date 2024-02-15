@@ -10,9 +10,7 @@ import java.util.Map;
 
 public class DrugEditor implements Editor<Drug> {
 
-    private static final int COUNT = DrugParameters.values().length;
-
-    private boolean isValidNumberOfValues(Map<String, List<String>> params) {
+    private boolean isValidNumberOfValues(Map<String, List<String>> params) throws ClientException {
         for (Map.Entry<String, List<String>> param : params.entrySet()) {
             boolean curr = switch (DrugParameters.parseParameterFromString(param.getKey())) {
                 case Name, Company, Country, Weight, Cost, Id -> param.getValue().size() == 1;
@@ -23,10 +21,6 @@ public class DrugEditor implements Editor<Drug> {
             }
         }
         return !params.isEmpty();
-    }
-
-    public boolean isValidDescription(Map<String, List<String>> params) {
-        return params.keySet().size() == COUNT && isValidNumberOfValues(params);
     }
 
     @Override
@@ -44,6 +38,6 @@ public class DrugEditor implements Editor<Drug> {
                 }
             }
         }
-        throw new IllegalArgumentException("Not valid parameters for replacement of the chosen Drug!");
+        throw new ClientException(StatusCode.Bad_Request);
     }
 }
