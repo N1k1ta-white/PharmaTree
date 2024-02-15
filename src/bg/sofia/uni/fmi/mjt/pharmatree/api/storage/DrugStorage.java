@@ -1,5 +1,6 @@
 package bg.sofia.uni.fmi.mjt.pharmatree.api.storage;
 
+import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Drug;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.parser.DrugConverter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.DrugEditor;
@@ -17,12 +18,12 @@ public final class DrugStorage extends BaseStorage<Drug> {
         instance = null;
     }
 
-    private DrugStorage() {
+    private DrugStorage() throws ServerException {
         super(new CopyOnWriteArrayList<>(), new DrugFilter(), new DrugEditor(), new DrugConverter(), PATH_TO_DB);
         instance = this;
     }
 
-    public static synchronized DrugStorage getInstance() {
+    public static synchronized DrugStorage getInstance() throws ServerException {
         if (instance == null) {
             return new DrugStorage();
         }

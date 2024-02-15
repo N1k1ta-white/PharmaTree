@@ -1,12 +1,12 @@
 package bg.sofia.uni.fmi.mjt.pharmatree.api.storage;
 
+import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Copyable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.parser.ItemConverter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.Editor;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.Filter;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,29 +28,19 @@ public abstract sealed class BaseStorage<E extends Copyable<E>> implements Stora
     private final Path path;
     private final ItemConverter<E> itemConverter;
 
-//    private static final int PAIR = 2;
-
-    private void getAllDataFromFile() {
+    private void getAllDataFromFile() throws ServerException {
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 storage.add(itemConverter.parseLine(line));
             }
         } catch (IOException e) {
-            throw new UncheckedIOException("The file of DB hasn't been found or something else", e);
+            throw new ServerException(StatusCode.Service_Unavailable, e);
         }
     }
 
-//    private JsonArray parseJsonArray(String json) {
-//        JsonElement elem = JsonParser.parseString(json);
-//        if (!elem.isJsonArray()) {
-//            // TODO: exception
-//        }
-//        return elem.getAsJsonArray();
-//    }
-
     protected BaseStorage(CopyOnWriteArrayList<E> storage, Filter<E> filter, Editor<E> editor, ItemConverter<E> parser,
-                          Path path) {
+                          Path path) throws ServerException {
         this.storage = storage;
         this.filter = filter;
         this.editor = editor;
@@ -60,32 +50,33 @@ public abstract sealed class BaseStorage<E extends Copyable<E>> implements Stora
     }
 
     @Override
-    public void edit(int id, Map<String, List<String>> edit) {
+    public void edit(int id, Map<String, List<String>> edit) throws ClientException {
         Optional<E> result = filter.getElementById(storage.stream(), id);
         if (result.isEmpty()) {
-            // TODO exception
+            throw new ClientException(StatusCode.Not_Found);
         }
         editor.editElement(result.get(), edit);
     }
 
-    public void replace(int id, String json) {
+    public void replace(int id, String json) throws ClientException {
         Optional<E> objForReplace = filter.getElementById(storage.stream(), id);
         if (objForReplace.isEmpty()) {
-            // TODO: exception
+            throw new ClientException(StatusCode.Not_Found);
         }
         E newObj = itemConverter.parseJson(json);
         objForReplace.get().copy(newObj);
     }
 
     @Override
-    public void replaceOrAdd(int id, String json) {
+    public StatusCode replaceOrAdd(int id, String json) {
         Optional<E> objForReplace = filter.getElementById(storage.stream(), id);
         if (objForReplace.isEmpty()) {
             add(json);
-        } else {
-            E newObj = itemConverter.parseJson(json);
-            objForReplace.get().copy(newObj);
+            return StatusCode.Created;
         }
+        E newObj = itemConverter.parseJson(json);
+        objForReplace.get().copy(newObj);
+        return StatusCode.OK;
     }
 
     @Override
@@ -94,27 +85,29 @@ public abstract sealed class BaseStorage<E extends Copyable<E>> implements Stora
     }
 
     @Override
-    public void delete(int id) {
+    public StatusCode delete(int id) throws ClientException {
         Optional<E> obj = filter.getElementById(storage.stream(), id);
         if (obj.isEmpty()) {
-            // TODO: exception
+            throw new ClientException(StatusCode.Not_Found);
         }
         synchronized (BaseStorage.class) {
-            if (!storage.remove(obj)) {
-                // TODO: exception
+            if (!storage.remove(obj.get())) {
+                return StatusCode.Accepted;
             }
+            return StatusCode.OK;
         }
     }
 
     @Override
-    public void add(String json) {
+    public StatusCode add(String json) {
         E obj = itemConverter.parseJson(json);
         synchronized (BaseStorage.class) {
             if (!storage.contains(obj)) {
                 storage.add(obj);
+                return StatusCode.Created;
             }
+            return StatusCode.OK;
         }
-        // TODO: exception
     }
 
     @Override

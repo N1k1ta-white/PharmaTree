@@ -8,19 +8,19 @@ import java.util.Objects;
 public class Drug implements Copyable<Drug> {
     private static final String SEPARATOR = ";";
     private static final String SEPARATOR_ARRAY = ",";
-    @SerializedName("name")
+//    @SerializedName("name")
     private String name;
-    @SerializedName("company")
+//    @SerializedName("company")
     private String company;
-    @SerializedName("country")
+//    @SerializedName("country")
     private String country;
-    @SerializedName("properties")
+//    @SerializedName("properties")
     private List<String> properties;
-    @SerializedName("cost")
+//    @SerializedName("cost")
     private double cost;
-    @SerializedName("weight")
+//    @SerializedName("weight")
     private double weight;
-    @SerializedName("id")
+//    @SerializedName("id")
     private int id;
 
     public Drug(int id, String name, String company, String country, List<String> properties, double cost,

@@ -1,6 +1,8 @@
 package bg.sofia.uni.fmi.mjt.pharmatree.api.storage;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.Property;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.PropertyEditor;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.PropertyFilter;
 
 import java.nio.file.Path;
 import java.util.concurrent.CopyOnWriteArrayList;
