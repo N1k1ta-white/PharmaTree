@@ -1,13 +1,12 @@
 package bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property;
 
-
-// TODO: Flyweight
-
-import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Copyable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
 
 import java.util.List;
 
-public class Property implements Copyable<Property> {
+public class Property implements Copyable<Property>, Identifiable {
+    private int id;
     private String name;
     private String description;
     private List<String> allergies;
@@ -19,13 +18,14 @@ public class Property implements Copyable<Property> {
         allergies = elem.allergies;
     }
 
-    public Property(String name, String description, List<String> allergies) {
+    public Property(int id, String name, String description, List<String> allergies) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.allergies = allergies;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
@@ -33,7 +33,7 @@ public class Property implements Copyable<Property> {
         this.name = name;
     }
 
-    public String getDescription() {
+    public String description() {
         return description;
     }
 
@@ -41,11 +41,21 @@ public class Property implements Copyable<Property> {
         this.description = description;
     }
 
-    public List<String> getAllergies() {
+    public List<String> allergies() {
         return allergies;
     }
 
     public void setAllergies(List<String> allergies) {
         this.allergies = allergies;
+    }
+
+    @Override
+    public int id() {
+        return id;
+    }
+
+    @Override
+    public void setId(int newId) {
+        id = newId;
     }
 }

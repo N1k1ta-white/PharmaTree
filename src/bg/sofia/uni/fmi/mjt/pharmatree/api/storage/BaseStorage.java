@@ -2,11 +2,12 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.storage;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
-import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Copyable;
-import bg.sofia.uni.fmi.mjt.pharmatree.api.items.parser.ItemConverter;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.converter.ItemConverter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.Editor;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.Filter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,28 +16,45 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
-public abstract sealed class BaseStorage<E extends Copyable<E>> implements Storage<E>
+public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> implements Storage
         permits DrugStorage, PropertyStorage, UserStorage {
-    private final CopyOnWriteArrayList<E> storage;
+    protected final CopyOnWriteArrayList<E> storage;
     private final Filter<E> filter;
     private final Editor<E> editor;
     private final Path path;
     private final ItemConverter<E> itemConverter;
+    private final AtomicInteger id;
+    private final Map<String, String> cache;
 
     private void getAllDataFromFile() throws ServerException {
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 storage.add(itemConverter.parseLine(line));
+                if (id.get() < storage.getLast().id()) {
+                    id.set(storage.getLast().id());
+                }
             }
         } catch (IOException e) {
             throw new ServerException(StatusCode.Service_Unavailable, e);
         }
+        id.incrementAndGet();
+    }
+
+    private String paramsToString(Map<String, List<String>> params) {
+        return params.entrySet().stream()
+                .map(entry -> entry.getKey() + ":" + String.join(",", entry.getValue()))
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 
     protected BaseStorage(CopyOnWriteArrayList<E> storage, Filter<E> filter, Editor<E> editor, ItemConverter<E> parser,
@@ -46,16 +64,19 @@ public abstract sealed class BaseStorage<E extends Copyable<E>> implements Stora
         this.editor = editor;
         this.path = path;
         this.itemConverter = parser;
+        id = new AtomicInteger(0);
+        cache = new HashMap<>();
         getAllDataFromFile();
     }
 
     @Override
-    public void edit(int id, Map<String, List<String>> edit) throws ClientException {
+    public void edit(int id, Map<String, List<String>> edit) throws ClientException, ServerException {
         Optional<E> result = filter.getElementById(storage.stream(), id);
         if (result.isEmpty()) {
             throw new ClientException(StatusCode.Not_Found);
         }
         editor.editElement(result.get(), edit);
+        cache.clear();
     }
 
     public void replace(int id, String json) throws ClientException {
@@ -65,11 +86,13 @@ public abstract sealed class BaseStorage<E extends Copyable<E>> implements Stora
         }
         E newObj = itemConverter.parseJson(json);
         objForReplace.get().copy(newObj);
+        cache.clear();
     }
 
     @Override
-    public StatusCode replaceOrAdd(int id, String json) {
+    public StatusCode replaceOrAdd(int id, String json) throws ClientException {
         Optional<E> objForReplace = filter.getElementById(storage.stream(), id);
+        cache.clear();
         if (objForReplace.isEmpty()) {
             add(json);
             return StatusCode.Created;
@@ -80,33 +103,42 @@ public abstract sealed class BaseStorage<E extends Copyable<E>> implements Stora
     }
 
     @Override
-    public String get(Map<String, List<String>> params) {
-        return itemConverter.convertListToJson(filter.filterStreamByParams(storage.stream(), params).toList());
+    public String get(Map<String, List<String>> params) throws ClientException {
+        String request = paramsToString(params);
+        if (!cache.containsKey(request)) {
+            String res = itemConverter.convertListToJson(filter
+                    .filterStreamByParams(storage.stream(), params).toList());
+            cache.put(request, res);
+            return res;
+        }
+        return cache.get(request);
     }
 
     @Override
-    public StatusCode delete(int id) throws ClientException {
+    public void delete(int id) throws ClientException {
         Optional<E> obj = filter.getElementById(storage.stream(), id);
         if (obj.isEmpty()) {
             throw new ClientException(StatusCode.Not_Found);
         }
+        cache.clear();
         synchronized (BaseStorage.class) {
             if (!storage.remove(obj.get())) {
-                return StatusCode.Accepted;
+                throw new ClientException(StatusCode.Not_Found);
             }
-            return StatusCode.OK;
         }
     }
 
     @Override
-    public StatusCode add(String json) {
+    public void add(String json) throws ClientException {
         E obj = itemConverter.parseJson(json);
         synchronized (BaseStorage.class) {
             if (!storage.contains(obj)) {
+                cache.clear();
+                obj.setId(id.getAndIncrement());
                 storage.add(obj);
-                return StatusCode.Created;
+            } else {
+                throw new ClientException(StatusCode.Conflict);
             }
-            return StatusCode.OK;
         }
     }
 

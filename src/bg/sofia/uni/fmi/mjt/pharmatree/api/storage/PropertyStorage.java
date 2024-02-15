@@ -1,6 +1,9 @@
 package bg.sofia.uni.fmi.mjt.pharmatree.api.storage;
 
+import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.Property;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.converter.PropertyConverter;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.PropertyEditor;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.PropertyFilter;
 
@@ -15,15 +18,26 @@ public final class PropertyStorage extends BaseStorage<Property> {
         instance = null;
     }
 
-    private PropertyStorage() {
-        super(new CopyOnWriteArrayList<>(), new PropertyFilter(), new PropertyEditor(), new PropertyParser(), PATH_TO_DB);
+    private PropertyStorage() throws ServerException {
+        super(new CopyOnWriteArrayList<>(), new PropertyFilter(), new PropertyEditor(),
+                new PropertyConverter(), PATH_TO_DB);
         instance = this;
     }
 
-    public static synchronized PropertyStorage getInstance() {
+    public static synchronized PropertyStorage getInstance() throws ServerException {
         if (instance == null) {
             return new PropertyStorage();
         }
         return instance;
+    }
+
+    @Override
+    public int getSecurityLevelRead() {
+        return Role.Registered.getSecurityLevel();
+    }
+
+    @Override
+    public int getSecurityLevelEdit() {
+        return Role.Admin.getSecurityLevel();
     }
 }

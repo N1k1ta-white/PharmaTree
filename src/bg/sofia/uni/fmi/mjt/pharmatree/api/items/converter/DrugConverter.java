@@ -1,4 +1,4 @@
-package bg.sofia.uni.fmi.mjt.pharmatree.api.items.parser;
+package bg.sofia.uni.fmi.mjt.pharmatree.api.items.converter;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Drug;
 import com.google.gson.JsonParser;
@@ -13,8 +13,6 @@ public class DrugConverter implements ItemConverter<Drug> {
     private static final int PROP = 4;
     private static final int COST = 5;
     private static final int WEIGHT = 6;
-    private static final String SEPARATOR = ";";
-    private static final String SEPARATOR_ARRAY = ",";
     public Drug parseLine(String line) {
         String[] elements = line.split(SEPARATOR);
         return new Drug(Integer.parseInt(elements[ID]), elements[NAME], elements[COMP], elements[COUNTRY],

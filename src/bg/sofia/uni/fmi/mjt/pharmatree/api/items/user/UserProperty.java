@@ -1,22 +1,19 @@
-package bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug;
+package bg.sofia.uni.fmi.mjt.pharmatree.api.items.user;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 
 import java.util.Arrays;
 
-public enum DrugParameters {
+public enum UserProperty {
     Id("id"),
     Name("name"),
-    Company("company"),
-    Country("country"),
-    Properties("properties"),
-    Cost("cost"),
-    Weight("weight");
+    Role("role"),
+    UserId("user-id");
 
     private final String name;
 
-    DrugParameters(String str) {
+    UserProperty(String str) {
         name = str;
     }
 
@@ -24,8 +21,8 @@ public enum DrugParameters {
         return name;
     }
 
-    public static DrugParameters parseParameterFromString(String str) throws ClientException {
-        return Arrays.stream(DrugParameters.values())
+    public static UserProperty parseParameterFromString(String str) throws ClientException {
+        return Arrays.stream(UserProperty.values())
                 .filter(elem -> elem.getString().equals(str))
                 .findAny()
                 .orElseThrow(() -> new ClientException(StatusCode.Bad_Request));
