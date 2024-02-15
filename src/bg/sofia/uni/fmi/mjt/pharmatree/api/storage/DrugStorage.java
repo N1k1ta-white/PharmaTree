@@ -26,6 +26,7 @@ public final class DrugStorage extends BaseStorage<Drug> {
 
     public static synchronized DrugStorage getInstance() throws ServerException {
         if (instance == null) {
+            PropertyStorage.getInstance();
             return new DrugStorage();
         }
         return instance;

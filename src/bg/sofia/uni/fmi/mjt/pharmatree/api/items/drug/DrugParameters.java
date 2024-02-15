@@ -28,6 +28,6 @@ public enum DrugParameters {
         return Arrays.stream(DrugParameters.values())
                 .filter(elem -> elem.getString().equals(str))
                 .findAny()
-                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request));
+                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Incorrect drug parameter"));
     }
 }

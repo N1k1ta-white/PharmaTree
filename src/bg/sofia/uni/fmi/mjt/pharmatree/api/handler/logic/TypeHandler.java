@@ -20,7 +20,7 @@ public enum TypeHandler {
 
     public static TypeHandler parseMethodType(String type) throws ClientException {
         return Arrays.stream(TypeHandler.values()).filter(elem -> elem.name.equals(type)).findAny().orElseThrow(
-                () -> new ClientException(StatusCode.Bad_Request)
+                () -> new ClientException(StatusCode.Bad_Request, "Invalid type of method!")
         );
     }
 }

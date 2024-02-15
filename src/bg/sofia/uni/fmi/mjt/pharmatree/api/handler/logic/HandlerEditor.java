@@ -29,7 +29,7 @@ public abstract sealed class HandlerEditor implements Handler
     protected static Map<String, List<String>> getAndCheckParameters(HttpExchange exchange) throws ClientException {
         Map<String, List<String>> params = ParserQuery.parseQuery(exchange.getRequestURI().getQuery());
         if (!params.containsKey(QUERY_ID) && params.get(QUERY_ID).size() == 1) {
-            throw new ClientException(StatusCode.Bad_Request);
+            throw new ClientException(StatusCode.Bad_Request, "You can't send more than one id for methods!");
         }
         return params;
     }

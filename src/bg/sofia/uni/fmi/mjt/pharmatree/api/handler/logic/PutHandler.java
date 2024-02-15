@@ -21,12 +21,13 @@ public final class PutHandler extends HandlerEditor {
             Storage storage = StorageFactory.of(type);
             Map<String, List<String>> params = getAndCheckParameters(exchange);
             if (auth.getSecurityLevel() < storage.getSecurityLevelEdit()) {
-                throw new ClientException(StatusCode.Forbidden);
+                throw new ClientException(StatusCode.Forbidden, "You haven't required access level(put)!");
             }
             Handler.writeResponse(exchange, storage.replaceOrAdd(Integer.parseInt(params.get(QUERY_ID).getFirst()),
                     getJson(exchange)));
         } catch (IOException e) {
-            throw new ServerException(StatusCode.Internal_Server_Error, e);
+            throw new ServerException(StatusCode.Internal_Server_Error,
+                    "Unexpected error in server during writing response(patch)", e);
         }
     }
 }

@@ -20,13 +20,14 @@ public final class PatchHandler extends HandlerEditor {
             ItemsType type = ItemsType.parseFromString(Handler.getType(exchange));
             Storage storage = StorageFactory.of(type);
             if (auth.getSecurityLevel() < storage.getSecurityLevelEdit()) {
-                throw new ClientException(StatusCode.Forbidden);
+                throw new ClientException(StatusCode.Forbidden, "You haven't required access level(patch)!");
             }
             Map<String, List<String>> params = getAndCheckParameters(exchange);
             storage.edit(Integer.parseInt(params.get(QUERY_ID).getFirst()), params);
             Handler.writeResponse(exchange, StatusCode.OK);
         } catch (IOException e) {
-            throw new ServerException(StatusCode.Internal_Server_Error, e);
+            throw new ServerException(StatusCode.Internal_Server_Error,
+                    "Unexpected error in server during writing response(patch)", e);
         }
     }
 }

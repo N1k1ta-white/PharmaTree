@@ -13,7 +13,7 @@ public class Authentication {
         if (exchange.getRequestHeaders().get(UserProperty.UserId.getString()).isEmpty()) {
             return Role.Unregistered;
         } else if (exchange.getRequestHeaders().get(UserProperty.UserId.getString()).size() > 1) {
-            throw new ClientException(StatusCode.Bad_Request);
+            throw new ClientException(StatusCode.Bad_Request, "Requires only one userId");
         }
         return UserStorage.getInstance().getRoleByUserId(exchange.getRequestHeaders()
                 .get(UserProperty.UserId.getString()).getFirst());

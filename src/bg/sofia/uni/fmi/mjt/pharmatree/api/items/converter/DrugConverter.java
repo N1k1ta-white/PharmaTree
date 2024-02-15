@@ -1,8 +1,10 @@
 package bg.sofia.uni.fmi.mjt.pharmatree.api.items.converter;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Drug;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyController;
 import com.google.gson.JsonParser;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class DrugConverter implements ItemConverter<Drug> {
@@ -16,8 +18,8 @@ public class DrugConverter implements ItemConverter<Drug> {
     public Drug parseLine(String line) {
         String[] elements = line.split(SEPARATOR);
         return new Drug(Integer.parseInt(elements[ID]), elements[NAME], elements[COMP], elements[COUNTRY],
-                List.of(elements[PROP].split(SEPARATOR_ARRAY)), Double.parseDouble(elements[COST]),
-                Double.parseDouble(elements[WEIGHT]));
+                Arrays.stream(elements[PROP].split(SEPARATOR_ARRAY)).map(PropertyController::getProperty).toList(),
+                Double.parseDouble(elements[COST]), Double.parseDouble(elements[WEIGHT]));
     }
 
     public Drug parseJson(String json) {

@@ -18,6 +18,6 @@ public enum ItemsType {
 
     public static ItemsType parseFromString(String type) throws ClientException {
         return Arrays.stream(ItemsType.values()).filter(elem -> elem.name.equals(type)).findAny().orElseThrow(
-                () -> new ClientException(StatusCode.Not_Found));
+                () -> new ClientException(StatusCode.Not_Found, "Incorrect item type"));
     }
 }

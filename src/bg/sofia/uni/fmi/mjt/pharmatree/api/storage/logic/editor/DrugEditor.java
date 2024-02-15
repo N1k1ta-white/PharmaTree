@@ -3,6 +3,7 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.Drug;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.DrugParameters;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyController;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 
 import java.util.List;
@@ -31,13 +32,15 @@ public class DrugEditor implements Editor<Drug> {
                     case Name -> element.setName(param.getValue().getFirst());
                     case Company -> element.setCompany(param.getValue().getFirst());
                     case Country -> element.setCountry(param.getValue().getFirst());
-                    case Properties -> element.setProperties(param.getValue());
+                    case Properties -> element.setProperties(param.getValue().stream()
+                            .map(PropertyController::getProperty)
+                            .toList());
                     case Weight -> element.setWeight(Double.parseDouble(param.getValue().getFirst()));
                     case Cost -> element.setCost(Double.parseDouble(param.getValue().getFirst()));
-                    case Id -> throw new ClientException(StatusCode.Bad_Request);
+                    case Id -> throw new ClientException(StatusCode.Bad_Request, "You can't edit id in Drug object");
                 }
             }
         }
-        throw new ClientException(StatusCode.Bad_Request);
+        throw new ClientException(StatusCode.Bad_Request, "Invalid number of values of parameters");
     }
 }

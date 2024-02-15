@@ -25,6 +25,6 @@ public enum UserProperty {
         return Arrays.stream(UserProperty.values())
                 .filter(elem -> elem.getString().equals(str))
                 .findAny()
-                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request));
+                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Incorrect user parameter"));
     }
 }

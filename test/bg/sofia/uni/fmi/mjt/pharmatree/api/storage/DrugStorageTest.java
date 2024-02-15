@@ -35,5 +35,6 @@ public class DrugStorageTest {
         Storage storage = DrugStorage.getInstance();
         storage.delete(1);
         storage.flush();
+
     }
 }

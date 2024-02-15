@@ -39,13 +39,19 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                storage.add(itemConverter.parseLine(line));
+                try {
+                    storage.add(itemConverter.parseLine(line));
+                } catch (ClientException e) {
+                    throw new ServerException(StatusCode.Internal_Server_Error,
+                            "Error in server during of starting of Storage");
+                }
                 if (id.get() < storage.getLast().id()) {
                     id.set(storage.getLast().id());
                 }
             }
         } catch (IOException e) {
-            throw new ServerException(StatusCode.Service_Unavailable, e);
+            throw new ServerException(StatusCode.Service_Unavailable,
+                    "Unexpected error during of starting of storage", e);
         }
         id.incrementAndGet();
     }
@@ -70,10 +76,10 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
     }
 
     @Override
-    public void edit(int id, Map<String, List<String>> edit) throws ClientException, ServerException {
+    public void edit(int id, Map<String, List<String>> edit) throws ClientException {
         Optional<E> result = filter.getElementById(storage.stream(), id);
         if (result.isEmpty()) {
-            throw new ClientException(StatusCode.Not_Found);
+            throw new ClientException(StatusCode.Not_Found, "Object for editing hasn't found");
         }
         editor.editElement(result.get(), edit);
         cache.clear();
@@ -82,7 +88,7 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
     public void replace(int id, String json) throws ClientException {
         Optional<E> objForReplace = filter.getElementById(storage.stream(), id);
         if (objForReplace.isEmpty()) {
-            throw new ClientException(StatusCode.Not_Found);
+            throw new ClientException(StatusCode.Not_Found, "Object for replacement hasn't found");
         }
         E newObj = itemConverter.parseJson(json);
         objForReplace.get().copy(newObj);
@@ -118,12 +124,12 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
     public void delete(int id) throws ClientException {
         Optional<E> obj = filter.getElementById(storage.stream(), id);
         if (obj.isEmpty()) {
-            throw new ClientException(StatusCode.Not_Found);
+            throw new ClientException(StatusCode.Not_Found, "Object for deleting hasn't found");
         }
         cache.clear();
         synchronized (BaseStorage.class) {
             if (!storage.remove(obj.get())) {
-                throw new ClientException(StatusCode.Not_Found);
+                throw new ClientException(StatusCode.Not_Found, "Object almost has deleted");
             }
         }
     }
@@ -137,7 +143,7 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
                 obj.setId(id.getAndIncrement());
                 storage.add(obj);
             } else {
-                throw new ClientException(StatusCode.Conflict);
+                throw new ClientException(StatusCode.Conflict, "Object already exist in storage");
             }
         }
     }

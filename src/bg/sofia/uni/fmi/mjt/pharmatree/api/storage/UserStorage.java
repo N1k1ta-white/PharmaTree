@@ -35,7 +35,7 @@ public final class UserStorage extends BaseStorage<User> {
 
     public Role getRoleByUserId(String userId) throws ClientException {
         return storage.stream().filter(elem -> elem.userId().equals(userId)).findAny().orElseThrow(
-                () -> new ClientException(StatusCode.Bad_Request)
+                () -> new ClientException(StatusCode.Bad_Request, "Incorrect userId")
         ).role();
     }
 

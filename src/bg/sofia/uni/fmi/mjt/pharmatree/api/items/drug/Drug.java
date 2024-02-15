@@ -2,9 +2,11 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyController;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Drug implements Copyable<Drug>, Identifiable {
     private static final String SEPARATOR = ";";
@@ -12,13 +14,13 @@ public class Drug implements Copyable<Drug>, Identifiable {
     private String name;
     private String company;
     private String country;
-    private List<String> properties;
+    private List<PropertyController.Property> properties;
     private double cost;
     private double weight;
     private int id;
 
-    public Drug(int id, String name, String company, String country, List<String> properties, double cost,
-                double weight) {
+    public Drug(int id, String name, String company, String country, List<PropertyController.Property> properties,
+                double cost, double weight) {
         this.id = id;
         this.name = name;
         this.company = company;
@@ -55,7 +57,9 @@ public class Drug implements Copyable<Drug>, Identifiable {
     @Override
     public String toString() {
         return id + SEPARATOR + name + SEPARATOR + company + SEPARATOR + country + SEPARATOR
-                + String.join(SEPARATOR_ARRAY, properties) + SEPARATOR + cost + SEPARATOR + weight;
+                + properties.stream()
+                .map(PropertyController.Property::name)
+                .collect(Collectors.joining(SEPARATOR_ARRAY)) + SEPARATOR + cost + SEPARATOR + weight;
     }
 
     public int id() {
@@ -91,11 +95,11 @@ public class Drug implements Copyable<Drug>, Identifiable {
         this.country = country;
     }
 
-    public List<String> properties() {
+    public List<PropertyController.Property> properties() {
         return properties;
     }
 
-    public void setProperties(List<String> properties) {
+    public void setProperties(List<PropertyController.Property> properties) {
         this.properties = properties;
     }
 

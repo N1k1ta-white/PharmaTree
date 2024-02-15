@@ -1,6 +1,6 @@
 package bg.sofia.uni.fmi.mjt.pharmatree.api.items.converter;
 
-import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.User;
 import com.google.gson.JsonParser;
@@ -25,7 +25,7 @@ public class UserConverter implements ItemConverter<User> {
     }
 
     @Override
-    public User parseLine(String line) throws ServerException {
+    public User parseLine(String line) throws ClientException {
         String[] data = line.split(SEPARATOR);
         return new User(Integer.parseInt(data[ID]), data[NAME], Role.parseParameterFromString(data[ROLE]),
                 data[USER_ID]);

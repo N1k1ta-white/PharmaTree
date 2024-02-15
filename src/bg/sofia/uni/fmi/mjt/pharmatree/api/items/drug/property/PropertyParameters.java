@@ -25,6 +25,6 @@ public enum PropertyParameters {
         return Arrays.stream(PropertyParameters.values())
                 .filter(elem -> elem.getString().equals(str))
                 .findAny()
-                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request));
+                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Incorrect parameter for Property"));
     }
 }
