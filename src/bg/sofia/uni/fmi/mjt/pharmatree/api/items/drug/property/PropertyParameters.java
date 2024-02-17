@@ -17,13 +17,13 @@ public enum PropertyParameters {
         this.name = name;
     }
 
-    public String getString() {
+    public String getValue() {
         return name;
     }
 
     public static PropertyParameters parseParameterFromString(String str) throws ClientException {
         return Arrays.stream(PropertyParameters.values())
-                .filter(elem -> elem.getString().equals(str))
+                .filter(elem -> elem.getValue().equals(str))
                 .findAny()
                 .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Incorrect parameter for Property"));
     }

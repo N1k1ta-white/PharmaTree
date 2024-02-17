@@ -1,0 +1,4 @@
+id;name;company;country;properties;cost;weight
+1;testD1;testCo;Alemania;test2;5;10
+2;testD2;testCo;Alemania;test2;10;100
+4;testD3;testCo2;Ukraine;test1;10;5

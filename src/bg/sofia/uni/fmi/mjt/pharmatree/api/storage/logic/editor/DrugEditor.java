@@ -7,40 +7,29 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyControlle
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
-public class DrugEditor implements Editor<Drug> {
-
-    private boolean isValidNumberOfValues(Map<String, List<String>> params) throws ClientException {
-        for (Map.Entry<String, List<String>> param : params.entrySet()) {
-            boolean curr = switch (DrugParameters.parseParameterFromString(param.getKey())) {
-                case Name, Company, Country, Weight, Cost, Id -> param.getValue().size() == 1;
-                case Properties -> !param.getValue().isEmpty();
-            };
-            if (!curr) {
-                return false;
-            }
-        }
-        return !params.isEmpty();
+public class DrugEditor extends BaseEditor<Drug> {
+    @Override
+    protected boolean isValidNumberOfValue(String param, int size) throws ClientException {
+        return switch (DrugParameters.parseParameterFromString(param)) {
+            case Name, Company, Country, Weight, Cost, Id -> size == 1;
+            case Properties -> size != 0;
+        };
     }
 
     @Override
-    public void editElement(Drug element, Map<String, List<String>> params) throws ClientException {
-        if (isValidNumberOfValues(params)) {
-            for (Map.Entry<String, List<String>> param : params.entrySet()) {
-                switch (DrugParameters.parseParameterFromString(param.getKey())) {
-                    case Name -> element.setName(param.getValue().getFirst());
-                    case Company -> element.setCompany(param.getValue().getFirst());
-                    case Country -> element.setCountry(param.getValue().getFirst());
-                    case Properties -> element.setProperties(param.getValue().stream()
-                            .map(PropertyController::getProperty)
-                            .toList());
-                    case Weight -> element.setWeight(Double.parseDouble(param.getValue().getFirst()));
-                    case Cost -> element.setCost(Double.parseDouble(param.getValue().getFirst()));
-                    case Id -> throw new ClientException(StatusCode.Bad_Request, "You can't edit id in Drug object");
-                }
-            }
+    protected void edit(Drug element, String param, List<String> val) throws ClientException {
+        switch (DrugParameters.parseParameterFromString(param)) {
+            case Name -> element.setName(val.getFirst());
+            case Company -> element.setCompany(val.getFirst());
+            case Country -> element.setCountry(val.getFirst());
+            case Properties -> element.setProperties(val.stream()
+                    .map(PropertyController::getProperty)
+                    .collect(Collectors.toList()));
+            case Weight -> element.setWeight(Double.parseDouble(val.getFirst()));
+            case Cost -> element.setCost(Double.parseDouble(val.getFirst()));
+            case Id -> throw new ClientException(StatusCode.Bad_Request, "You can't edit id in Drug object");
         }
-        throw new ClientException(StatusCode.Bad_Request, "Invalid number of values of parameters");
     }
 }

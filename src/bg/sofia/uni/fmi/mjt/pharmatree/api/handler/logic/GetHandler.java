@@ -25,8 +25,7 @@ public class GetHandler implements Handler {
             if (auth.getSecurityLevel() < storage.getSecurityLevelRead()) {
                 throw new ClientException(StatusCode.Forbidden, "You haven't required access level(get)!");
             }
-            String res = storage.get(params);
-            Handler.writeResponse(exchange, StatusCode.OK, res);
+            Handler.writeResponse(exchange, StatusCode.OK, storage.get(params));
         } catch (IOException e) {
             throw new ServerException(StatusCode.Internal_Server_Error,
                     "Unexpected error in server during writing response(get)");

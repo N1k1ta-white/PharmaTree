@@ -11,11 +11,16 @@ import java.nio.charset.StandardCharsets;
 
 public interface Handler {
     int POS_OF_TYPE = 1;
-    int COUNT_OF_PARTS = 3;
+    int COUNT_OF_PARTS = 2;
     String SEPARATOR = "/";
-    static String getType(HttpExchange exchange) {
+    String ROOT = "api";
+
+    static String getType(HttpExchange exchange) throws ClientException {
         String path = exchange.getRequestURI().getPath();
         String[] arr = path.split(SEPARATOR, COUNT_OF_PARTS);
+        if (!arr[0].equals(ROOT)) {
+            throw new ClientException(StatusCode.Not_Found, "Unknown URI path");
+        }
         return arr[POS_OF_TYPE];
     }
 

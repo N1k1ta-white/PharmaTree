@@ -17,13 +17,13 @@ public enum UserProperty {
         name = str;
     }
 
-    public String getString() {
+    public String getValue() {
         return name;
     }
 
     public static UserProperty parseParameterFromString(String str) throws ClientException {
         return Arrays.stream(UserProperty.values())
-                .filter(elem -> elem.getString().equals(str))
+                .filter(elem -> elem.getValue().equals(str))
                 .findAny()
                 .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Incorrect user parameter"));
     }

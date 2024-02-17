@@ -7,6 +7,8 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.ItemsType;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.Storage;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.StorageFactory;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
@@ -22,8 +24,11 @@ public final class PatchHandler extends HandlerEditor {
             if (auth.getSecurityLevel() < storage.getSecurityLevelEdit()) {
                 throw new ClientException(StatusCode.Forbidden, "You haven't required access level(patch)!");
             }
-            Map<String, List<String>> params = getAndCheckParameters(exchange);
-            storage.edit(Integer.parseInt(params.get(QUERY_ID).getFirst()), params);
+            Map<String, List<String>> id = getAndCheckParameters(exchange);
+            Gson gson = new Gson();
+            Map<String, List<String>> params = gson.fromJson(getJson(exchange),
+                    new TypeToken<Map<String, List<String>>>() { }.getType());
+            storage.edit(Integer.parseInt(id.get(QUERY_ID).getFirst()), params);
             Handler.writeResponse(exchange, StatusCode.OK);
         } catch (IOException e) {
             throw new ServerException(StatusCode.Internal_Server_Error,

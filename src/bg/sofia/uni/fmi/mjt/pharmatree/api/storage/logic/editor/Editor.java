@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface Editor<E> {
-    // boolean isValidDescription(Map<String, List<String>> params);
-
     void editElement(E element, Map<String, List<String>> params) throws ClientException;
 
 }

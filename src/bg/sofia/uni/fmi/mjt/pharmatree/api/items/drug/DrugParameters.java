@@ -20,13 +20,13 @@ public enum DrugParameters {
         name = str;
     }
 
-    public String getString() {
+    public String getValue() {
         return name;
     }
 
     public static DrugParameters parseParameterFromString(String str) throws ClientException {
         return Arrays.stream(DrugParameters.values())
-                .filter(elem -> elem.getString().equals(str))
+                .filter(elem -> elem.getValue().equals(str))
                 .findAny()
                 .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Incorrect drug parameter"));
     }

@@ -11,6 +11,7 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> implements Storage
         permits DrugStorage, PropertyStorage, UserStorage {
     protected final CopyOnWriteArrayList<E> storage;
-    private final Filter<E> filter;
+    protected final Filter<E> filter;
     private final Editor<E> editor;
     private final Path path;
     private final ItemConverter<E> itemConverter;
@@ -36,8 +37,18 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
     private final Map<String, String> cache;
 
     private void getAllDataFromFile() throws ServerException {
+        File file = path.toFile();
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new ServerException(StatusCode.Service_Unavailable,
+                        "Error during of creating of storage", e);
+            }
+        }
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
             String line;
+            reader.readLine();
             while ((line = reader.readLine()) != null) {
                 try {
                     storage.add(itemConverter.parseLine(line));
@@ -75,28 +86,34 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
         getAllDataFromFile();
     }
 
+    protected abstract String getFirstLine();
+
     @Override
     public void edit(int id, Map<String, List<String>> edit) throws ClientException {
         Optional<E> result = filter.getElementById(storage.stream(), id);
         if (result.isEmpty()) {
             throw new ClientException(StatusCode.Not_Found, "Object for editing hasn't found");
         }
-        editor.editElement(result.get(), edit);
+        synchronized (result.get()) {
+            editor.editElement(result.get(), edit);
+        }
         cache.clear();
     }
 
-    public void replace(int id, String json) throws ClientException {
+    public void replace(int id, String json) throws ClientException, ServerException {
         Optional<E> objForReplace = filter.getElementById(storage.stream(), id);
         if (objForReplace.isEmpty()) {
-            throw new ClientException(StatusCode.Not_Found, "Object for replacement hasn't found");
+            throw new ClientException(StatusCode.Not_Found, "Object for replacement hasn't been found");
         }
         E newObj = itemConverter.parseJson(json);
-        objForReplace.get().copy(newObj);
+        synchronized (objForReplace.get()) {
+            objForReplace.get().copy(newObj);
+        }
         cache.clear();
     }
 
     @Override
-    public StatusCode replaceOrAdd(int id, String json) throws ClientException {
+    public StatusCode replaceOrAdd(int id, String json) throws ClientException, ServerException {
         Optional<E> objForReplace = filter.getElementById(storage.stream(), id);
         cache.clear();
         if (objForReplace.isEmpty()) {
@@ -104,7 +121,9 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
             return StatusCode.Created;
         }
         E newObj = itemConverter.parseJson(json);
-        objForReplace.get().copy(newObj);
+        synchronized (objForReplace.get()) {
+            objForReplace.get().copy(newObj);
+        }
         return StatusCode.OK;
     }
 
@@ -112,8 +131,11 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
     public String get(Map<String, List<String>> params) throws ClientException {
         String request = paramsToString(params);
         if (!cache.containsKey(request)) {
-            String res = itemConverter.convertListToJson(filter
-                    .filterStreamByParams(storage.stream(), params).toList());
+            List<E> list = filter.filterStreamByParams(storage.stream(), params).toList();
+            if (list.isEmpty()) {
+                throw new ClientException(StatusCode.Not_Found, "Item no found");
+            }
+            String res = itemConverter.convertListToJson(list);
             cache.put(request, res);
             return res;
         }
@@ -121,21 +143,21 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
     }
 
     @Override
-    public void delete(int id) throws ClientException {
+    public void delete(int id) throws ClientException, ServerException {
         Optional<E> obj = filter.getElementById(storage.stream(), id);
         if (obj.isEmpty()) {
-            throw new ClientException(StatusCode.Not_Found, "Object for deleting hasn't found");
+            throw new ClientException(StatusCode.Not_Found, "Object for deleting hasn't been found");
         }
         cache.clear();
         synchronized (BaseStorage.class) {
             if (!storage.remove(obj.get())) {
-                throw new ClientException(StatusCode.Not_Found, "Object almost has deleted");
+                throw new ClientException(StatusCode.Not_Found, "Object almost has been deleted");
             }
         }
     }
 
     @Override
-    public void add(String json) throws ClientException {
+    public void add(String json) throws ClientException, ServerException {
         E obj = itemConverter.parseJson(json);
         synchronized (BaseStorage.class) {
             if (!storage.contains(obj)) {
@@ -151,12 +173,14 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
     @Override
     public synchronized void flush() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile(), false))) {
+            writer.write(getFirstLine());
+            writer.newLine();
             for (E elem : storage) {
                 writer.write(elem.toString());
                 writer.newLine();
             }
         } catch (IOException e) {
-            throw new UncheckedIOException("The file of drugs hasn't been found or something else", e);
+            throw new UncheckedIOException("The file of drugs has been damaged or not found", e);
         }
     }
 }

@@ -7,34 +7,23 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.UserProperty;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 
 import java.util.List;
-import java.util.Map;
 
-public class UserEditor implements Editor<User> {
+public class UserEditor extends BaseEditor<User> {
 
-    private boolean isValidNumberOfValues(Map<String, List<String>> params) throws ClientException {
-        for (Map.Entry<String, List<String>> param : params.entrySet()) {
-            boolean curr = switch (UserProperty.parseParameterFromString(param.getKey())) {
-                case Name, Id, Role, UserId  -> param.getValue().size() == 1;
-            };
-            if (!curr) {
-                return false;
-            }
-        }
-        return !params.isEmpty();
+    @Override
+    protected boolean isValidNumberOfValue(String param, int size) throws ClientException {
+        return switch (UserProperty.parseParameterFromString(param)) {
+            case Name, Id, Role, UserId  -> size == 1;
+        };
     }
 
     @Override
-    public void editElement(User element, Map<String, List<String>> params) throws ClientException {
-        if (isValidNumberOfValues(params)) {
-            for (Map.Entry<String, List<String>> param : params.entrySet()) {
-                switch (UserProperty.parseParameterFromString(param.getKey())) {
-                    case Name -> element.setName(param.getValue().getFirst());
-                    case Role -> element.setRole(Role.parseParameterFromString(param.getValue().getFirst()));
-                    case UserId -> element.serUserId(param.getValue().getFirst());
-                    case Id -> throw new ClientException(StatusCode.Bad_Request, "You can't edit id of User object");
-                }
-            }
+    protected void edit(User element, String param, List<String> val) throws ClientException {
+        switch (UserProperty.parseParameterFromString(param)) {
+            case Name -> element.setName(val.getFirst());
+            case Role -> element.setRole(Role.parseParameterFromString(val.getFirst()));
+            case UserId -> element.setUserId(val.getFirst());
+            case Id -> throw new ClientException(StatusCode.Bad_Request, "You can't edit id of User object");
         }
-        throw new ClientException(StatusCode.Bad_Request, "Invalid number of parameters");
     }
 }

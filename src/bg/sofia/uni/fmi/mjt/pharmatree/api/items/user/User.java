@@ -2,6 +2,9 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.items.user;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.util.CsvSeparator;
+
+import java.util.Objects;
 
 public class User implements Copyable<User>, Identifiable {
     private int id;
@@ -20,7 +23,6 @@ public class User implements Copyable<User>, Identifiable {
     public void copy(User elem) {
         name = elem.name;
         role = elem.role;
-        userId = elem.userId;
     }
 
     @Override
@@ -28,16 +30,36 @@ public class User implements Copyable<User>, Identifiable {
         return id;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        User user = (User) object;
+        return Objects.equals(name, user.name) && role == user.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, role);
+    }
+
     public String userId() {
         return userId;
     }
 
-    public void serUserId(String userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
     public Role role() {
         return role;
+    }
+
+    @Override
+    public String toString() {
+        return id + CsvSeparator.getSeparator() + name
+                + CsvSeparator.getSeparator() + role.getValue()
+                + CsvSeparator.getSeparator() + userId;
     }
 
     public void setRole(Role role) {

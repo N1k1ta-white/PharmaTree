@@ -3,14 +3,13 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyController;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.util.CsvSeparator;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Drug implements Copyable<Drug>, Identifiable {
-    private static final String SEPARATOR = ";";
-    private static final String SEPARATOR_ARRAY = ",";
     private String name;
     private String company;
     private String country;
@@ -25,7 +24,8 @@ public class Drug implements Copyable<Drug>, Identifiable {
         this.name = name;
         this.company = company;
         this.country = country;
-        this.properties = properties;
+        this.properties = properties.stream()
+                .filter(prop -> !prop.equals(PropertyController.getEmptyProperty())).collect(Collectors.toList());
         this.cost = cost;
         this.weight = weight;
     }
@@ -56,10 +56,12 @@ public class Drug implements Copyable<Drug>, Identifiable {
 
     @Override
     public String toString() {
-        return id + SEPARATOR + name + SEPARATOR + company + SEPARATOR + country + SEPARATOR
+        return id + CsvSeparator.getSeparator() + name + CsvSeparator.getSeparator() + company
+                + CsvSeparator.getSeparator() + country + CsvSeparator.getSeparator()
                 + properties.stream()
                 .map(PropertyController.Property::name)
-                .collect(Collectors.joining(SEPARATOR_ARRAY)) + SEPARATOR + cost + SEPARATOR + weight;
+                .collect(Collectors.joining(CsvSeparator.getArraySeparator())) + CsvSeparator.getSeparator() + cost
+                + CsvSeparator.getSeparator() + weight;
     }
 
     public int id() {

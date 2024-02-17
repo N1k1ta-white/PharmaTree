@@ -16,7 +16,7 @@ public class UserFilter extends BaseFilter<User> {
             case Id -> stream.filter(elem -> param.getValue().stream()
                     .map(Integer::parseInt).toList().contains(elem.id()));
             case Name -> stream.filter(elem -> param.getValue().contains(elem.name()));
-            case Role -> stream.filter(elem -> param.getValue().contains(elem.role().getName()));
+            case Role -> stream.filter(elem -> param.getValue().contains(elem.role().getValue()));
             case UserId -> stream.filter(elem -> param.getValue().contains(elem.userId()));
         };
     }

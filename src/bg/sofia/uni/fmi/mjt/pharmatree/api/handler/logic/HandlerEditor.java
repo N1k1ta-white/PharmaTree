@@ -18,7 +18,10 @@ public abstract sealed class HandlerEditor implements Handler
     protected String getJson(HttpExchange exchange) {
         StringBuilder strBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(exchange.getRequestBody()))) {
-            strBuilder.append(reader.readLine());
+            String line;
+            while ((line = reader.readLine()) != null) {
+                strBuilder.append(line);
+            }
         } catch (IOException e) {
             throw new UncheckedIOException("Have some problems with reading from InputStream in HttpRequest: "
                     + exchange.getRequestURI(), e);

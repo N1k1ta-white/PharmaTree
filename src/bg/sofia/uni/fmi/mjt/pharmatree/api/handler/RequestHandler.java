@@ -5,6 +5,8 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.authentication.Authentication;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.Handler;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.HandlerFactory;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
+import com.google.gson.JsonParseException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -27,9 +29,11 @@ public class RequestHandler implements HttpHandler {
             Handler handler = HandlerFactory.of(exchange.getRequestMethod());
             handler.execute(exchange, Authentication.auth(exchange));
         } catch (ClientException e) {
-            Handler.writeResponse(exchange, e.getCode());
+            Handler.writeResponse(exchange, e.getCode(), e.getJsonMessage());
         } catch (ServerException e) {
-            Handler.writeResponse(exchange, e.getCode());
+            Handler.writeResponse(exchange, e.getCode(), e.getJsonMessage());
+        } catch (JsonParseException e) {
+            Handler.writeResponse(exchange, StatusCode.Bad_Request, "Invalid Json");
         }
     }
 }

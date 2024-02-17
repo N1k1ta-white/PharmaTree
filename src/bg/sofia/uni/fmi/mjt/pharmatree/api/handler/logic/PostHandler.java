@@ -21,7 +21,7 @@ public final class PostHandler extends HandlerEditor {
                 throw new ClientException(StatusCode.Forbidden, "You haven't required access level(post)!");
             }
             storage.add(getJson(exchange));
-            Handler.writeResponse(exchange, StatusCode.OK);
+            Handler.writeResponse(exchange, StatusCode.Created);
         } catch (IOException e) {
             throw new ServerException(StatusCode.Internal_Server_Error,
                     "Unexpected error in server during writing response(patch)", e);

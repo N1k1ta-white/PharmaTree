@@ -18,7 +18,7 @@ public class PropertyFilter extends BaseFilter<PropertyController.Property> {
                     .map(Integer::parseInt).toList().contains(elem.id()));
             case Name -> stream.filter(elem -> param.getValue().contains(elem.name()));
             case Description -> stream.filter(elem -> param.getValue().contains(elem.description()));
-            case Allergies -> stream.filter(elem -> new HashSet<>(param.getValue()).containsAll(elem.allergies()));
+            case Allergies -> stream.filter(elem -> new HashSet<>(elem.allergies()).containsAll(param.getValue()));
         };
     }
 }

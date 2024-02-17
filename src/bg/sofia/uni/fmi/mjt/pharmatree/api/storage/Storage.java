@@ -14,15 +14,15 @@ public sealed interface Storage permits BaseStorage {
 
     void edit(int id, Map<String, List<String>> edit) throws ClientException, ServerException;
 
-    StatusCode replaceOrAdd(int id, String json) throws ClientException;
+    StatusCode replaceOrAdd(int id, String json) throws ClientException, ServerException;
 
-    void replace(int id, String json) throws ClientException;
+    void replace(int id, String json) throws ClientException, ServerException;
 
     String get(Map<String, List<String>> params) throws ClientException;
 
-    void delete(int id) throws ClientException;
+    void delete(int id) throws ClientException, ServerException;
 
-    void add(String element) throws ClientException;
+    void add(String element) throws ClientException, ServerException;
 
     void flush();
 }

@@ -6,35 +6,23 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyParameter
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 
 import java.util.List;
-import java.util.Map;
 
-public class PropertyEditor implements Editor<PropertyController.Property> {
-    private boolean isValidNumberOfValues(Map<String, List<String>> params) throws ClientException {
-        for (Map.Entry<String, List<String>> param : params.entrySet()) {
-            boolean curr = switch (PropertyParameters.parseParameterFromString(param.getKey())) {
-                case Name, Id, Description -> param.getValue().size() == 1;
-                case Allergies -> !param.getValue().isEmpty();
-            };
-            if (!curr) {
-                return false;
-            }
-        }
-        return !params.isEmpty();
+public class PropertyEditor extends BaseEditor<PropertyController.Property> {
+    @Override
+    protected boolean isValidNumberOfValue(String param, int size) throws ClientException {
+        return switch (PropertyParameters.parseParameterFromString(param)) {
+            case Name, Id, Description -> size == 1;
+            case Allergies -> size != 0;
+        };
     }
 
     @Override
-    public void editElement(PropertyController.Property element, Map<String, List<String>> params)
-            throws ClientException {
-        if (isValidNumberOfValues(params)) {
-            for (Map.Entry<String, List<String>> param : params.entrySet()) {
-                switch (PropertyParameters.parseParameterFromString(param.getKey())) {
-                    case Name -> element.setName(param.getValue().getFirst());
-                    case Description -> element.setDescription(param.getValue().getFirst());
-                    case Allergies -> element.setAllergies(param.getValue());
-                    case Id -> throw new ClientException(StatusCode.Bad_Request, "You can't edit Property's id!");
-                }
-            }
+    protected void edit(PropertyController.Property element, String param, List<String> val) throws ClientException {
+        switch (PropertyParameters.parseParameterFromString(param)) {
+            case Name -> element.setName(val.getFirst());
+            case Description -> element.setDescription(val.getFirst());
+            case Allergies -> element.setAllergies(val);
+            case Id -> throw new ClientException(StatusCode.Bad_Request, "You can't edit Property's id!");
         }
-        throw new ClientException(StatusCode.Bad_Request, "Not valid parameters for editing of Property!");
     }
 }
