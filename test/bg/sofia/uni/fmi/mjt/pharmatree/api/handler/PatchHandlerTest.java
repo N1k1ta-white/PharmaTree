@@ -5,7 +5,6 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.GetHandler;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.Handler;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.PatchHandler;
-import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.PutHandler;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.testHelper.TestHelper;
 import com.sun.net.httpserver.HttpExchange;
@@ -37,12 +36,12 @@ public class PatchHandlerTest {
         OutputStream output = Mockito.mock(OutputStream.class);
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
         when(exchange.getRequestURI()).thenReturn(uri);
-        when(uri.getPath()).thenReturn("api/user");
+        when(uri.getPath()).thenReturn("/api/user");
         when(uri.getQuery()).thenReturn("id=5");
         when(exchange.getResponseBody()).thenReturn(output);
         Handler request = new PatchHandler();
         String res = "OK";
-        request.execute(exchange, Role.Admin);
+        request.execute(exchange, Role.ADMIN);
         verify(output).write(res.getBytes(StandardCharsets.UTF_8));
         request = new GetHandler();
         res = """
@@ -55,10 +54,10 @@ public class PatchHandlerTest {
                   }
                 ]""";
         OutputStream output2 = Mockito.mock(OutputStream.class);
-        when(uri.getPath()).thenReturn("api/user");
+        when(uri.getPath()).thenReturn("/api/user");
         when(uri.getQuery()).thenReturn("id=5");
         when(exchange.getResponseBody()).thenReturn(output2);
-        request.execute(exchange, Role.Admin);
+        request.execute(exchange, Role.ADMIN);
         verify(output2).write(res.getBytes(StandardCharsets.UTF_8));
     }
 }

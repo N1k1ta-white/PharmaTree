@@ -1,1 +1,9 @@
 id;name;company;country;properties;cost;weight
+1;testD1;testCo;France;test2;5.0;10.0
+2;testD2;testCo;France;test2;10.0;100.0
+4;testD3;testCo2;Ukraine;test1;10.0;5.0
+3;testD4;testCo3;Spain;test3,test1;8.0;20.0
+5;testD5;testCo4;Italy;test1;15.0;15.0
+6;testD6;testCo5;France;test3;12.0;25.0
+7;testD7;testCo6;Germany;test2;6.0;12.0
+8;testD8;testCo7;Japan;test3;18.0;30.0

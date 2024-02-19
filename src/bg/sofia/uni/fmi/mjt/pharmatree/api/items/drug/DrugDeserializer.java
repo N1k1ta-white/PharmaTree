@@ -19,8 +19,8 @@ public class DrugDeserializer implements JsonDeserializer<Drug> {
             throws JsonParseException {
         JsonObject obj = jsonElement.getAsJsonObject();
         List<PropertyController.Property> propertyList = new ArrayList<>();
-        if (obj.has(DrugParameters.Properties.getValue())) {
-            for (JsonElement prop : obj.getAsJsonArray(DrugParameters.Properties.getValue())) {
+        if (obj.has(DrugParameters.PROPERTIES.getValue())) {
+            for (JsonElement prop : obj.getAsJsonArray(DrugParameters.PROPERTIES.getValue())) {
                 PropertyController.Property curr = PropertyController.getProperty(prop.getAsString());
                 if (!curr.equals(PropertyController.getEmptyProperty())) {
                     propertyList.add(curr);
@@ -28,15 +28,15 @@ public class DrugDeserializer implements JsonDeserializer<Drug> {
             }
         }
         Map<String, String> elementMap = obj.asMap().entrySet().stream()
-                .filter(entry -> !entry.getKey().equals(DrugParameters.Properties.getValue()))
+                .filter(entry -> !entry.getKey().equals(DrugParameters.PROPERTIES.getValue()))
                 .map(entry -> Map.entry(entry.getKey(), entry.getValue().getAsString()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return new Drug(0,
-                elementMap.getOrDefault(DrugParameters.Name.getValue(), ""),
-                elementMap.getOrDefault(DrugParameters.Company.getValue(), ""),
-                elementMap.getOrDefault(DrugParameters.Country.getValue(), ""),
+                elementMap.getOrDefault(DrugParameters.NAME.getValue(), ""),
+                elementMap.getOrDefault(DrugParameters.COMPANY.getValue(), ""),
+                elementMap.getOrDefault(DrugParameters.COUNTRY.getValue(), ""),
                 propertyList,
-                Double.parseDouble(elementMap.getOrDefault(DrugParameters.Cost.getValue(),  "0")),
-                Double.parseDouble(elementMap.getOrDefault(DrugParameters.Weight.getValue(), "0")));
+                Double.parseDouble(elementMap.getOrDefault(DrugParameters.COST.getValue(),  "0")),
+                Double.parseDouble(elementMap.getOrDefault(DrugParameters.WEIGHT.getValue(), "0")));
     }
 }

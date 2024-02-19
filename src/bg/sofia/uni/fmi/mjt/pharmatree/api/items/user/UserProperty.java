@@ -6,10 +6,10 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 import java.util.Arrays;
 
 public enum UserProperty {
-    Id("id"),
-    Name("name"),
-    Role("role"),
-    UserId("user-id");
+    ID("id"),
+    NAME("name"),
+    ROLE("role"),
+    USER_ID("user-id");
 
     private final String name;
 
@@ -25,6 +25,6 @@ public enum UserProperty {
         return Arrays.stream(UserProperty.values())
                 .filter(elem -> elem.getValue().equals(str))
                 .findAny()
-                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Incorrect user parameter"));
+                .orElseThrow(() -> new ClientException(StatusCode.BAD_REQUEST, "Incorrect user parameter"));
     }
 }

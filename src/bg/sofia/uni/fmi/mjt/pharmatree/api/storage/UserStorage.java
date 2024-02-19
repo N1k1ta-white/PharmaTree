@@ -8,13 +8,14 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.User;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.UserProperty;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.UserEditor;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.faststorage.FastStorage;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.UserFilter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.CsvSeparator;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class UserStorage extends BaseStorage<User> {
@@ -22,12 +23,14 @@ public final class UserStorage extends BaseStorage<User> {
     private static String defaultPath = "users.csv";
     private static UserStorage instance;
 
+    private Map<String, Role> userIdStorage;
+
     static {
         instance = null;
     }
 
     private UserStorage() throws ServerException {
-        super(new CopyOnWriteArrayList<>(), new UserFilter(), new UserEditor(), new UserConverter(),
+        super(new FastStorage<>(), new UserFilter(), new UserEditor(), new UserConverter(),
                 Path.of(defaultPath));
         instance = this;
     }
@@ -53,22 +56,22 @@ public final class UserStorage extends BaseStorage<User> {
     }
 
     public Role getRoleByUserId(String userId) throws ClientException {
-        return storage.stream().parallel().filter(elem -> elem.userId().equals(userId)).findAny().orElseThrow(
-                () -> new ClientException(StatusCode.Bad_Request, "Incorrect userId")
+        return storage.getStream().parallel().filter(elem -> elem.userId().equals(userId)).findAny().orElseThrow(
+                () -> new ClientException(StatusCode.BAD_REQUEST, "Incorrect userId")
         ).role();
     }
 
     public boolean isUserIdExist(String userId) {
-        return storage.stream().parallel().anyMatch(user -> user.userId().equals(userId));
+        return storage.getStream().parallel().anyMatch(user -> user.userId().equals(userId));
     }
 
     @Override
     public int getSecurityLevelEdit() {
-        return Role.Admin.getSecurityLevel();
+        return Role.ADMIN.getSecurityLevel();
     }
 
     @Override
     public int getSecurityLevelRead() {
-        return Role.Admin.getSecurityLevel();
+        return Role.ADMIN.getSecurityLevel();
     }
 }

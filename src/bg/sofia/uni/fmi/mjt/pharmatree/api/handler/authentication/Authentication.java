@@ -10,13 +10,13 @@ import com.sun.net.httpserver.HttpExchange;
 
 public class Authentication {
     public static Role auth(HttpExchange exchange) throws ServerException, ClientException {
-        if (exchange.getRequestHeaders().get(UserProperty.UserId.getValue()) == null ||
-                exchange.getRequestHeaders().get(UserProperty.UserId.getValue()).isEmpty()) {
-            return Role.Unregistered;
-        } else if (exchange.getRequestHeaders().get(UserProperty.UserId.getValue()).size() > 1) {
-            throw new ClientException(StatusCode.Bad_Request, "Requires only one userId");
+        if (exchange.getRequestHeaders().get(UserProperty.USER_ID.getValue()) == null ||
+                exchange.getRequestHeaders().get(UserProperty.USER_ID.getValue()).isEmpty()) {
+            return Role.UNREGISTERED;
+        } else if (exchange.getRequestHeaders().get(UserProperty.USER_ID.getValue()).size() > 1) {
+            throw new ClientException(StatusCode.BAD_REQUEST, "Requires only one userId");
         }
         return UserStorage.getInstance().getRoleByUserId(exchange.getRequestHeaders()
-                .get(UserProperty.UserId.getValue()).getFirst());
+                .get(UserProperty.USER_ID.getValue()).getFirst());
     }
 }

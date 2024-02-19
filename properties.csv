@@ -1,2 +1,6 @@
 id;name;description;allergies
-2;test2;test description;
+2;test2;test description;lactose
+1;test1;another description;gluten
+3;test3;one more description;peanuts
+4;test4;description here;
+5;test5;description goes here;shellfish

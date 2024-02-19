@@ -12,7 +12,6 @@ import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,12 +76,12 @@ public class DrugStorageTest {
         List<Drug> drug = gson.fromJson(resJson, new TypeToken<List<Drug>>() {}.getType());
         int id = drug.getFirst().id();
         Map<String, List<String>> param = new HashMap<>();
-        param.put(DrugParameters.Cost.getValue(), List.of("500"));
-        param.put(DrugParameters.Properties.getValue(), List.of("test1"));
-        param.put(DrugParameters.Name.getValue(), List.of("tet"));
+        param.put(DrugParameters.COST.getValue(), List.of("500"));
+        param.put(DrugParameters.PROPERTIES.getValue(), List.of("test1"));
+        param.put(DrugParameters.NAME.getValue(), List.of("tet"));
         storage.edit(id, param);
         Map<String, List<String>> search = new HashMap<>();
-        search.put(DrugParameters.Id.getValue(), List.of(String.valueOf(id)));
+        search.put(DrugParameters.ID.getValue(), List.of(String.valueOf(id)));
         String json2 =  """
                          {
                             "name":"tet",
@@ -116,7 +115,7 @@ public class DrugStorageTest {
         DrugStorage drugStorage = DrugStorage.getInstance();
         propertyStorage.delete(2);
         Map<String, List<String>> param = new HashMap<>();
-        param.put(DrugParameters.Properties.getValue(), List.of("test2"));
+        param.put(DrugParameters.PROPERTIES.getValue(), List.of("test2"));
         assertThrows(ClientException.class, () -> drugStorage.get(param));
     }
 
@@ -146,7 +145,7 @@ public class DrugStorageTest {
         int id = res.getFirst().id();
         storage.delete(id);
         param.clear();
-        param.put(DrugParameters.Id.getValue(), List.of(String.valueOf(id)));
+        param.put(DrugParameters.ID.getValue(), List.of(String.valueOf(id)));
         assertThrows(ClientException.class, () -> storage.get(param));
     }
 
@@ -168,7 +167,7 @@ public class DrugStorageTest {
                          }""";
         storage.replace(4, json);
         Map<String, List<String>> param = new HashMap<>();
-        param.put(DrugParameters.Id.getValue(), List.of(String.valueOf(4)));
+        param.put(DrugParameters.ID.getValue(), List.of(String.valueOf(4)));
         List<Drug> dr = gson.fromJson(storage.get(param), new TypeToken<List<Drug>>() {}.getType());
         assertEquals(dr.size(), 1);
         assertEquals(conv.parseJson(json), dr.getFirst());
@@ -196,12 +195,12 @@ public class DrugStorageTest {
                             "weight":10
                          }""";
         StatusCode res = storage.replaceOrAdd(-1, json);
-        assertEquals(res, StatusCode.Created);
+        assertEquals(res, StatusCode.CREATED);
         Map<String, List<String>> param = TestHelper.getParamsByObject(conv.parseJson(json));
         List<Drug> drugList = gson.fromJson(storage.get(param), new TypeToken<List<Drug>>() {}.getType());
         int id = drugList.getFirst().id();
         param.clear();
-        param.put(DrugParameters.Id.getValue(), List.of(String.valueOf(id)));
+        param.put(DrugParameters.ID.getValue(), List.of(String.valueOf(id)));
         List<Drug> dr = gson.fromJson(storage.get(param), new TypeToken<List<Drug>>() {}.getType());
         assertEquals(dr.size(), 1);
         assertEquals(conv.parseJson(json), dr.getFirst());

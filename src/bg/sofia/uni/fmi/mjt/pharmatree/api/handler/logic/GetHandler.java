@@ -23,11 +23,11 @@ public class GetHandler implements Handler {
             ItemsType type = ItemsType.parseFromString(Handler.getType(exchange));
             Storage storage = StorageFactory.of(type);
             if (auth.getSecurityLevel() < storage.getSecurityLevelRead()) {
-                throw new ClientException(StatusCode.Forbidden, "You haven't required access level(get)!");
+                throw new ClientException(StatusCode.FORBIDDEN, "You haven't required access level(get)!");
             }
             Handler.writeResponse(exchange, StatusCode.OK, storage.get(params));
         } catch (IOException e) {
-            throw new ServerException(StatusCode.Internal_Server_Error,
+            throw new ServerException(StatusCode.INTERNAL_SERVER_ERROR,
                     "Unexpected error in server during writing response(get)");
         }
     }

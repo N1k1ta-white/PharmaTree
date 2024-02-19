@@ -2,6 +2,7 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Nameable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyController;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.CsvSeparator;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Drug implements Copyable<Drug>, Identifiable {
+public class Drug implements Copyable<Drug>, Identifiable, Nameable {
     private String name;
     private String company;
     private String country;

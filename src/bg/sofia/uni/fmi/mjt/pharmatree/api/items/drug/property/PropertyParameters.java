@@ -6,10 +6,10 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 import java.util.Arrays;
 
 public enum PropertyParameters {
-    Id("id"),
-    Name("name"),
-    Description("description"),
-    Allergies("allergies");
+    ID("id"),
+    NAME("name"),
+    DESCRIPTION("description"),
+    ALLERGIES("allergies");
 
     private final String name;
 
@@ -25,6 +25,6 @@ public enum PropertyParameters {
         return Arrays.stream(PropertyParameters.values())
                 .filter(elem -> elem.getValue().equals(str))
                 .findAny()
-                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Incorrect parameter for Property"));
+                .orElseThrow(() -> new ClientException(StatusCode.BAD_REQUEST, "Incorrect parameter for Property"));
     }
 }

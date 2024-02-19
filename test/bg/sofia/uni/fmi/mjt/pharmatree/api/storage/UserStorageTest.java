@@ -3,7 +3,6 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.storage;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
-import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.User;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.testHelper.TestHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ public class UserStorageTest {
 
     @Test
     void testGetRoleByUserId() throws ServerException, ClientException {
-        assertEquals(Role.Admin, UserStorage.getInstance().getRoleByUserId("admin"));
+        assertEquals(Role.ADMIN, UserStorage.getInstance().getRoleByUserId("admin"));
     }
 
     @Test

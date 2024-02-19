@@ -13,17 +13,17 @@ public class UserEditor extends BaseEditor<User> {
     @Override
     protected boolean isValidNumberOfValue(String param, int size) throws ClientException {
         return switch (UserProperty.parseParameterFromString(param)) {
-            case Name, Id, Role, UserId  -> size == 1;
+            case NAME, ID, ROLE, USER_ID -> size == 1;
         };
     }
 
     @Override
     protected void edit(User element, String param, List<String> val) throws ClientException {
         switch (UserProperty.parseParameterFromString(param)) {
-            case Name -> element.setName(val.getFirst());
-            case Role -> element.setRole(Role.parseParameterFromString(val.getFirst()));
-            case UserId -> element.setUserId(val.getFirst());
-            case Id -> throw new ClientException(StatusCode.Bad_Request, "You can't edit id of User object");
+            case NAME -> element.setName(val.getFirst());
+            case ROLE -> element.setRole(Role.parseParameterFromString(val.getFirst()));
+            case USER_ID -> element.setUserId(val.getFirst());
+            case ID -> throw new ClientException(StatusCode.BAD_REQUEST, "You can't edit id of User object");
         }
     }
 }

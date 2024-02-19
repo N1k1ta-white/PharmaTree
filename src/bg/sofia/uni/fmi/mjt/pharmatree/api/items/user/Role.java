@@ -8,11 +8,11 @@ import java.util.Arrays;
 
 public enum Role {
     @SerializedName("unregistered")
-    Unregistered(0, "unregistered"),
+    UNREGISTERED(0, "unregistered"),
     @SerializedName("registered")
-    Registered(1, "registered"),
+    REGISTERED(1, "registered"),
     @SerializedName("admin")
-    Admin(2, "admin");
+    ADMIN(2, "admin");
 
     private final int securityLevel;
     private final String name;
@@ -34,6 +34,6 @@ public enum Role {
         return Arrays.stream(Role.values())
                 .filter(elem -> elem.getValue().equals(str))
                 .findAny()
-                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Invalid value of Role"));
+                .orElseThrow(() -> new ClientException(StatusCode.BAD_REQUEST, "Invalid value of Role"));
     }
 }

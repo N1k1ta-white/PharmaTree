@@ -1,1 +1,12 @@
 id;name;role;user-id
+1;nik;admin;admin
+2;getTest;registered;idfortest
+3;forDelete;registered;gfdllgd
+4;fotPut;registered;njdftt
+5;forPatch;admin;iijifs
+6;newUser;registered;xyz123
+7;anotherUser;registered;abc456
+8;powerUser;admin;def789
+9;tempUser;registered;ghi012
+10;testUser;registered;jkl345
+11;customUser;registered;dduuquvuoiclkfgkvuuuipukieusdwgdgtp

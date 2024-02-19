@@ -31,8 +31,9 @@ public class PropertyConverter implements ItemConverter<PropertyController.Prope
     @Override
     public PropertyController.Property parseJson(String json) throws ClientException {
         PropertyController.Property property = GSON.fromJson(json, PropertyController.Property.class);
+        PropertyController.addToPool(property);
         if (property.name() == null || property.allergies() == null || property.description() == null) {
-            throw new ClientException(StatusCode.Bad_Request, "Request hasn't enough data for creating a Property");
+            throw new ClientException(StatusCode.BAD_REQUEST, "Request hasn't enough data for creating a Property");
         }
         return property;
     }

@@ -13,11 +13,9 @@ public class UserFilter extends BaseFilter<User> {
     protected Stream<User> filterStreamByParam(Stream<User> stream, Map.Entry<String, List<String>> param)
             throws ClientException {
         return switch (UserProperty.parseParameterFromString(param.getKey())) {
-            case Id -> stream.filter(elem -> param.getValue().stream()
-                    .map(Integer::parseInt).toList().contains(elem.id()));
-            case Name -> stream.filter(elem -> param.getValue().contains(elem.name()));
-            case Role -> stream.filter(elem -> param.getValue().contains(elem.role().getValue()));
-            case UserId -> stream.filter(elem -> param.getValue().contains(elem.userId()));
+            case ID, NAME -> stream;
+            case ROLE -> stream.filter(elem -> param.getValue().contains(elem.role().getValue()));
+            case USER_ID -> stream.filter(elem -> param.getValue().contains(elem.userId()));
         };
     }
 }

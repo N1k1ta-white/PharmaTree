@@ -8,12 +8,12 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.DrugParameters;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyController;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.DrugEditor;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.faststorage.FastStorage;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.DrugFilter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.CsvSeparator;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public final class DrugStorage extends BaseStorage<Drug> {
@@ -26,7 +26,7 @@ public final class DrugStorage extends BaseStorage<Drug> {
     }
 
     private void checkProperties() {
-        storage.stream().parallel().forEach(drug -> {
+        storage.getStream().parallel().forEach(drug -> {
             if (drug.properties().isEmpty()) {
                 storage.remove(drug);
             }
@@ -34,7 +34,7 @@ public final class DrugStorage extends BaseStorage<Drug> {
     }
 
     private DrugStorage() throws ServerException {
-        super(new CopyOnWriteArrayList<>(), new DrugFilter(), new DrugEditor(), new DrugConverter(),
+        super(new FastStorage<>(), new DrugFilter(), new DrugEditor(), new DrugConverter(),
                 Path.of(defaultPath));
         instance = this;
         checkProperties();
@@ -62,7 +62,7 @@ public final class DrugStorage extends BaseStorage<Drug> {
     }
 
     public synchronized void deletePropertyFromAllDrugs(PropertyController.Property property) {
-        storage.forEach(drug -> {
+        storage.getStream().forEach(drug -> {
             drug.properties().remove(property);
             if (drug.properties().isEmpty()) {
                 storage.remove(drug);
@@ -72,11 +72,11 @@ public final class DrugStorage extends BaseStorage<Drug> {
 
     @Override
     public int getSecurityLevelEdit() {
-        return Role.Admin.getSecurityLevel();
+        return Role.ADMIN.getSecurityLevel();
     }
 
     @Override
     public int getSecurityLevelRead() {
-        return Role.Registered.getSecurityLevel();
+        return Role.REGISTERED.getSecurityLevel();
     }
 }

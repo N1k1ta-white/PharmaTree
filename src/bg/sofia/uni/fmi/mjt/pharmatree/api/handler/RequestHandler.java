@@ -26,6 +26,7 @@ public class RequestHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
+            System.out.println("Client " + exchange.getRemoteAddress() + " have been entered");
             Handler handler = HandlerFactory.of(exchange.getRequestMethod());
             handler.execute(exchange, Authentication.auth(exchange));
         } catch (ClientException e) {
@@ -33,7 +34,7 @@ public class RequestHandler implements HttpHandler {
         } catch (ServerException e) {
             Handler.writeResponse(exchange, e.getCode(), e.getJsonMessage());
         } catch (JsonParseException e) {
-            Handler.writeResponse(exchange, StatusCode.Bad_Request, "Invalid Json");
+            Handler.writeResponse(exchange, StatusCode.BAD_REQUEST, "Invalid Json");
         }
     }
 }

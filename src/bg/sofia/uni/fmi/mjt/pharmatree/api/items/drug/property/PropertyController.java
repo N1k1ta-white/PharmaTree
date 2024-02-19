@@ -2,6 +2,7 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Nameable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.CsvSeparator;
 
 import java.util.HashMap;
@@ -30,6 +31,10 @@ public class PropertyController {
         return storage.get(name);
     }
 
+    public static synchronized void addToPool(Property prop) {
+        storage.put(prop.name(), prop);
+    }
+
     public static Property getProperty(String name) {
         if (storage.containsKey(name)) {
             return storage.get(name);
@@ -37,7 +42,7 @@ public class PropertyController {
         return none;
     }
 
-    public static class Property implements Copyable<Property>, Identifiable {
+    public static class Property implements Copyable<Property>, Identifiable, Nameable {
         private int id;
         private String name;
         private String description;

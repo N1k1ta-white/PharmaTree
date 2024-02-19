@@ -2,11 +2,12 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.items.user;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Nameable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.CsvSeparator;
 
 import java.util.Objects;
 
-public class User implements Copyable<User>, Identifiable {
+public class User implements Copyable<User>, Identifiable, Nameable {
     private int id;
     private String name;
     private Role role;

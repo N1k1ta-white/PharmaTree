@@ -11,18 +11,18 @@ public class PropertyEditor extends BaseEditor<PropertyController.Property> {
     @Override
     protected boolean isValidNumberOfValue(String param, int size) throws ClientException {
         return switch (PropertyParameters.parseParameterFromString(param)) {
-            case Name, Id, Description -> size == 1;
-            case Allergies -> size != 0;
+            case NAME, ID, DESCRIPTION -> size == 1;
+            case ALLERGIES -> size != 0;
         };
     }
 
     @Override
     protected void edit(PropertyController.Property element, String param, List<String> val) throws ClientException {
         switch (PropertyParameters.parseParameterFromString(param)) {
-            case Name -> element.setName(val.getFirst());
-            case Description -> element.setDescription(val.getFirst());
-            case Allergies -> element.setAllergies(val);
-            case Id -> throw new ClientException(StatusCode.Bad_Request, "You can't edit Property's id!");
+            case NAME -> element.setName(val.getFirst());
+            case DESCRIPTION -> element.setDescription(val.getFirst());
+            case ALLERGIES -> element.setAllergies(val);
+            case ID -> throw new ClientException(StatusCode.BAD_REQUEST, "You can't edit Property's id!");
         }
     }
 }

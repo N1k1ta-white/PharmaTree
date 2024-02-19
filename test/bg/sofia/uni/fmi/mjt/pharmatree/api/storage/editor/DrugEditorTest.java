@@ -31,9 +31,9 @@ public class DrugEditorTest {
     void testEditElement() throws ClientException {
         Drug test = drugExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(DrugParameters.Name.getValue(), List.of("new_name"));
-        params.put(DrugParameters.Country.getValue(), List.of("Ger"));
-        params.put(DrugParameters.Properties.getValue(), List.of("prop2"));
+        params.put(DrugParameters.NAME.getValue(), List.of("new_name"));
+        params.put(DrugParameters.COUNTRY.getValue(), List.of("Ger"));
+        params.put(DrugParameters.PROPERTIES.getValue(), List.of("prop2"));
         editor.editElement(test, params);
         assertEquals(test.name(), "new_name");
         assertEquals(test.country(), "Ger");
@@ -44,7 +44,7 @@ public class DrugEditorTest {
     void testEditElementExceptionNull() throws ClientException {
         Drug test = drugExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(DrugParameters.Name.getValue(), null);
+        params.put(DrugParameters.NAME.getValue(), null);
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
         params.clear();
         params.put(null, List.of("something"));
@@ -55,10 +55,10 @@ public class DrugEditorTest {
     void testEditElementExceptionInvalidArgs() throws ClientException {
         Drug test = drugExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(DrugParameters.Name.getValue() + "p", List.of("test"));
+        params.put(DrugParameters.NAME.getValue() + "p", List.of("test"));
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
         params.clear();
-        params.put(DrugParameters.Name.name() + "e", List.of("something"));
+        params.put(DrugParameters.NAME.name() + "e", List.of("something"));
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
     }
 
@@ -66,7 +66,7 @@ public class DrugEditorTest {
     void testEditElementExceptionIdEdit() throws ClientException {
         Drug test = drugExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(DrugParameters.Id.getValue(), List.of("test"));
+        params.put(DrugParameters.ID.getValue(), List.of("test"));
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
     }
 }

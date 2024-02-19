@@ -37,12 +37,12 @@ public class PutHandlerTest {
         OutputStream output = Mockito.mock(OutputStream.class);
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
         when(exchange.getRequestURI()).thenReturn(uri);
-        when(uri.getPath()).thenReturn("api/user");
+        when(uri.getPath()).thenReturn("/api/user");
         when(uri.getQuery()).thenReturn("id=-1");
         when(exchange.getResponseBody()).thenReturn(output);
         Handler request = new PutHandler();
         String res = "Created";
-        request.execute(exchange, Role.Admin);
+        request.execute(exchange, Role.ADMIN);
         verify(output).write(res.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -55,12 +55,12 @@ public class PutHandlerTest {
         OutputStream output = Mockito.mock(OutputStream.class);
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
         when(exchange.getRequestURI()).thenReturn(uri);
-        when(uri.getPath()).thenReturn("api/user");
+        when(uri.getPath()).thenReturn("/api/user");
         when(uri.getQuery()).thenReturn("id=4");
         when(exchange.getResponseBody()).thenReturn(output);
         Handler request = new PutHandler();
         String res = "OK";
-        request.execute(exchange, Role.Admin);
+        request.execute(exchange, Role.ADMIN);
         verify(output).write(res.getBytes(StandardCharsets.UTF_8));
         request = new GetHandler();
         res = """
@@ -73,10 +73,10 @@ public class PutHandlerTest {
                   }
                 ]""";
         OutputStream output2 = Mockito.mock(OutputStream.class);
-        when(uri.getPath()).thenReturn("api/user");
+        when(uri.getPath()).thenReturn("/api/user");
         when(uri.getQuery()).thenReturn("id=4");
         when(exchange.getResponseBody()).thenReturn(output2);
-        request.execute(exchange, Role.Admin);
+        request.execute(exchange, Role.ADMIN);
         verify(output2).write(res.getBytes(StandardCharsets.UTF_8));
     }
 }

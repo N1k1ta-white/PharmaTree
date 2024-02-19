@@ -2,13 +2,10 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.handler;
 
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
-import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.RequestHandler;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.GetHandler;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.handler.logic.Handler;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
-import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.UserProperty;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.testHelper.TestHelper;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,10 +14,7 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -40,7 +34,7 @@ public class GetHandlerTest {
         OutputStream output = Mockito.mock(OutputStream.class);
         when(exchange.getRequestURI()).thenReturn(uri);
         when(uri.getQuery()).thenReturn("name=getTest");
-        when(uri.getPath()).thenReturn("api/user");
+        when(uri.getPath()).thenReturn("/api/user");
         when(exchange.getResponseBody()).thenReturn(output);
         Handler request = new GetHandler();
         String res = """
@@ -52,7 +46,7 @@ public class GetHandlerTest {
                     "userId": "idfortest"
                   }
                 ]""";
-        request.execute(exchange, Role.Admin);
+        request.execute(exchange, Role.ADMIN);
         verify(output).write(res.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -63,11 +57,11 @@ public class GetHandlerTest {
         OutputStream output = Mockito.mock(OutputStream.class);
         when(exchange.getRequestURI()).thenReturn(uri);
         when(uri.getQuery()).thenReturn("name=getTest");
-        when(uri.getPath()).thenReturn("api/user");
+        when(uri.getPath()).thenReturn("/api/user");
         when(exchange.getResponseBody()).thenReturn(output);
         Handler request = new GetHandler();
-        assertThrows(ClientException.class, () -> request.execute(exchange, Role.Unregistered));
-        assertThrows(ClientException.class, () -> request.execute(exchange, Role.Registered));
+        assertThrows(ClientException.class, () -> request.execute(exchange, Role.UNREGISTERED));
+        assertThrows(ClientException.class, () -> request.execute(exchange, Role.REGISTERED));
     }
 
     @Test
@@ -76,11 +70,11 @@ public class GetHandlerTest {
         URI uri = mock(URI.class);
         OutputStream output = Mockito.mock(OutputStream.class);
         when(exchange.getRequestURI()).thenReturn(uri);
-        when(uri.getPath()).thenReturn("api/user");
+        when(uri.getPath()).thenReturn("/api/user");
         when(exchange.getResponseBody()).thenReturn(output);
         Handler request = new GetHandler();
         when(uri.getQuery()).thenReturn("=getTest");
-        assertThrows(ClientException.class, () -> request.execute(exchange, Role.Admin));
+        assertThrows(ClientException.class, () -> request.execute(exchange, Role.ADMIN));
     }
 
     @Test
@@ -90,12 +84,12 @@ public class GetHandlerTest {
         OutputStream output = Mockito.mock(OutputStream.class);
         when(exchange.getRequestURI()).thenReturn(uri);
         when(uri.getQuery()).thenReturn("name=getTest");
-        when(uri.getPath()).thenReturn("api/user/dsfds");
+        when(uri.getPath()).thenReturn("/api/user/dsfds");
         when(exchange.getResponseBody()).thenReturn(output);
         Handler request = new GetHandler();
-        assertThrows(ClientException.class, () -> request.execute(exchange, Role.Admin));
+        assertThrows(ClientException.class, () -> request.execute(exchange, Role.ADMIN));
         when(uri.getPath()).thenReturn("api/");
-        assertThrows(ClientException.class, () -> request.execute(exchange, Role.Admin));
+        assertThrows(ClientException.class, () -> request.execute(exchange, Role.ADMIN));
     }
 
     @Test
@@ -108,6 +102,6 @@ public class GetHandlerTest {
         when(uri.getPath()).thenReturn("");
         when(exchange.getResponseBody()).thenReturn(output);
         Handler request = new GetHandler();
-        assertThrows(ClientException.class, () -> request.execute(exchange, Role.Admin));
+        assertThrows(ClientException.class, () -> request.execute(exchange, Role.ADMIN));
     }
 }

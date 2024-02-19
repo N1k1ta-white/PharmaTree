@@ -14,11 +14,9 @@ public class PropertyFilter extends BaseFilter<PropertyController.Property> {
                                                                       Map.Entry<String, List<String>> param)
             throws ClientException {
         return switch (PropertyParameters.parseParameterFromString(param.getKey())) {
-            case Id -> stream.filter(elem -> param.getValue().stream()
-                    .map(Integer::parseInt).toList().contains(elem.id()));
-            case Name -> stream.filter(elem -> param.getValue().contains(elem.name()));
-            case Description -> stream.filter(elem -> param.getValue().contains(elem.description()));
-            case Allergies -> stream.filter(elem -> new HashSet<>(elem.allergies()).containsAll(param.getValue()));
+            case ID, NAME -> stream;
+            case DESCRIPTION -> stream.filter(elem -> param.getValue().contains(elem.description()));
+            case ALLERGIES -> stream.filter(elem -> new HashSet<>(elem.allergies()).containsAll(param.getValue()));
         };
     }
 }

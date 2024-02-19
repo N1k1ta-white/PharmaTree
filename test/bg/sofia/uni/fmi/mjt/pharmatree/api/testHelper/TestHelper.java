@@ -38,22 +38,22 @@ public class TestHelper {
         Map<String, List<String>> res = new HashMap<>();
         switch (obj) {
             case Drug dr:
-                res.put(DrugParameters.Name.getValue(), List.of(dr.name()));
-                res.put(DrugParameters.Company.getValue(), List.of(dr.company()));
-                res.put(DrugParameters.Country.getValue(), List.of(dr.country()));
-                res.put(DrugParameters.Properties.getValue(), dr.properties().stream()
+                res.put(DrugParameters.NAME.getValue(), List.of(dr.name()));
+                res.put(DrugParameters.COMPANY.getValue(), List.of(dr.company()));
+                res.put(DrugParameters.COUNTRY.getValue(), List.of(dr.country()));
+                res.put(DrugParameters.PROPERTIES.getValue(), dr.properties().stream()
                         .map(PropertyController.Property::name).toList());
-                res.put(DrugParameters.Weight.getValue(), List.of(String.valueOf(dr.weight())));
-                res.put(DrugParameters.Cost.getValue(), List.of(String.valueOf(dr.cost())));
+                res.put(DrugParameters.WEIGHT.getValue(), List.of(String.valueOf(dr.weight())));
+                res.put(DrugParameters.COST.getValue(), List.of(String.valueOf(dr.cost())));
                 break;
             case PropertyController.Property prop:
-                res.put(PropertyParameters.Name.getValue(), List.of(prop.name()));
-                res.put(PropertyParameters.Description.getValue(), List.of(prop.description()));
-                res.put(PropertyParameters.Allergies.getValue(), prop.allergies());
+                res.put(PropertyParameters.NAME.getValue(), List.of(prop.name()));
+                res.put(PropertyParameters.DESCRIPTION.getValue(), List.of(prop.description()));
+                res.put(PropertyParameters.ALLERGIES.getValue(), prop.allergies());
                 break;
             case User user:
-                res.put(UserProperty.Name.getValue(), List.of(user.name()));
-                res.put(UserProperty.Role.getValue(), List.of(user.name()));
+                res.put(UserProperty.NAME.getValue(), List.of(user.name()));
+                res.put(UserProperty.ROLE.getValue(), List.of(user.name()));
                 break;
             case null, default:
                 break;

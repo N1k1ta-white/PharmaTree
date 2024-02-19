@@ -8,14 +8,16 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyControlle
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.drug.property.PropertyParameters;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.PropertyEditor;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.faststorage.FastStorage;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.PropertyFilter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.CsvSeparator;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public final class PropertyStorage extends BaseStorage<PropertyController.Property> {
@@ -27,7 +29,7 @@ public final class PropertyStorage extends BaseStorage<PropertyController.Proper
     }
 
     private PropertyStorage() throws ServerException {
-        super(new CopyOnWriteArrayList<>(), new PropertyFilter(), new PropertyEditor(),
+        super(new FastStorage<>(), new PropertyFilter(), new PropertyEditor(),
                 new PropertyConverter(), Path.of(defaultPath));
         instance = this;
     }
@@ -48,12 +50,12 @@ public final class PropertyStorage extends BaseStorage<PropertyController.Proper
 
     @Override
     public int getSecurityLevelRead() {
-        return Role.Registered.getSecurityLevel();
+        return Role.REGISTERED.getSecurityLevel();
     }
 
     @Override
     public int getSecurityLevelEdit() {
-        return Role.Admin.getSecurityLevel();
+        return Role.ADMIN.getSecurityLevel();
     }
 
     @Override
@@ -64,10 +66,35 @@ public final class PropertyStorage extends BaseStorage<PropertyController.Proper
 
     @Override
     public synchronized void delete(int id) throws ClientException, ServerException {
-        Optional<PropertyController.Property> prop = filter.getElementById(storage.stream(), id);
+        Optional<PropertyController.Property> prop = storage.getById(id);
         if (prop.isEmpty()) {
-            throw new ClientException(StatusCode.Not_Found, "Object for editing hasn't found");
+            throw new ClientException(StatusCode.NOT_FOUND, "Object for delete hasn't found");
         }
         DrugStorage.getInstance().deletePropertyFromAllDrugs(prop.get());
+        DrugStorage.getInstance().cache.clear();
+        synchronized (PropertyStorage.class) {
+            if (!storage.remove(prop.get())) {
+                throw new ClientException(StatusCode.NOT_FOUND, "Object almost has been deleted");
+            }
+        }
+    }
+
+    @Override
+    public void edit(int id, Map<String, List<String>> edit) throws ClientException, ServerException {
+        super.edit(id, edit);
+        DrugStorage.getInstance().cache.clear();
+    }
+
+    @Override
+    public StatusCode replaceOrAdd(int id, String json) throws ClientException, ServerException {
+        StatusCode res = super.replaceOrAdd(id, json);
+        DrugStorage.getInstance().cache.clear();
+        return res;
+    }
+
+    @Override
+    public void replace(int id, String json) throws ClientException, ServerException {
+        super.replace(id, json);
+        DrugStorage.getInstance().cache.clear();
     }
 }

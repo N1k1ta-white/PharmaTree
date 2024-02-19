@@ -3,8 +3,10 @@ package bg.sofia.uni.fmi.mjt.pharmatree.api.storage;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Copyable;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Nameable;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.converter.ItemConverter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.editor.Editor;
+import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.faststorage.FastStorage;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.logic.filter.Filter;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.Identifiable;
@@ -18,23 +20,48 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> implements Storage
+public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable & Nameable> implements Storage
         permits DrugStorage, PropertyStorage, UserStorage {
-    protected final CopyOnWriteArrayList<E> storage;
+    protected FastStorage<E> storage;
+
     protected final Filter<E> filter;
     private final Editor<E> editor;
     private final Path path;
     private final ItemConverter<E> itemConverter;
     private final AtomicInteger id;
-    private final Map<String, String> cache;
+    protected final ConcurrentHashMap<String, String> cache;
+
+    private void reading(File file) throws ServerException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            reader.readLine();
+            int currId;
+            while ((line = reader.readLine()) != null) {
+                try {
+                    E item = itemConverter.parseLine(line);
+                    storage.add(item);
+                    currId = item.id();
+                } catch (ClientException e) {
+                    throw new ServerException(StatusCode.INTERNAL_SERVER_ERROR,
+                            "Error in server during of starting of Storage");
+                }
+                if (id.get() < currId) {
+                    id.set(currId);
+                }
+            }
+        } catch (IOException e) {
+            throw new ServerException(StatusCode.SERVICE_UNAVAILABLE,
+                    "Unexpected error during of starting of storage", e);
+        }
+        id.incrementAndGet();
+    }
 
     private void getAllDataFromFile() throws ServerException {
         File file = path.toFile();
@@ -42,29 +69,10 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                throw new ServerException(StatusCode.Service_Unavailable,
-                        "Error during of creating of storage", e);
+                throw new ServerException(StatusCode.SERVICE_UNAVAILABLE, "Error during of creating of storage", e);
             }
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
-            String line;
-            reader.readLine();
-            while ((line = reader.readLine()) != null) {
-                try {
-                    storage.add(itemConverter.parseLine(line));
-                } catch (ClientException e) {
-                    throw new ServerException(StatusCode.Internal_Server_Error,
-                            "Error in server during of starting of Storage");
-                }
-                if (id.get() < storage.getLast().id()) {
-                    id.set(storage.getLast().id());
-                }
-            }
-        } catch (IOException e) {
-            throw new ServerException(StatusCode.Service_Unavailable,
-                    "Unexpected error during of starting of storage", e);
-        }
-        id.incrementAndGet();
+        reading(file);
     }
 
     private String paramsToString(Map<String, List<String>> params) {
@@ -74,7 +82,7 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
                 .collect(Collectors.joining(System.lineSeparator()));
     }
 
-    protected BaseStorage(CopyOnWriteArrayList<E> storage, Filter<E> filter, Editor<E> editor, ItemConverter<E> parser,
+    protected BaseStorage(FastStorage<E> storage, Filter<E> filter, Editor<E> editor, ItemConverter<E> parser,
                           Path path) throws ServerException {
         this.storage = storage;
         this.filter = filter;
@@ -82,17 +90,23 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
         this.path = path;
         this.itemConverter = parser;
         id = new AtomicInteger(0);
-        cache = new HashMap<>();
+        cache = new ConcurrentHashMap<>();
         getAllDataFromFile();
     }
 
     protected abstract String getFirstLine();
 
     @Override
-    public void edit(int id, Map<String, List<String>> edit) throws ClientException {
-        Optional<E> result = filter.getElementById(storage.stream(), id);
+    public void edit(int id, Map<String, List<String>> edit) throws ClientException, ServerException {
+        Optional<E> result = storage.getById(id);
         if (result.isEmpty()) {
-            throw new ClientException(StatusCode.Not_Found, "Object for editing hasn't found");
+            throw new ClientException(StatusCode.NOT_FOUND, "Object for editing hasn't found");
+        }
+        if (edit.containsKey(Nameable.NAME_OF_ATTRIBUTE)) {
+            if (edit.get(Nameable.NAME_OF_ATTRIBUTE).size() != 1) {
+                throw new ClientException(StatusCode.BAD_REQUEST, "So many new names!");
+            }
+            storage.setNewName(result.get(), edit.get(Nameable.NAME_OF_ATTRIBUTE).getFirst());
         }
         synchronized (result.get()) {
             editor.editElement(result.get(), edit);
@@ -101,11 +115,12 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
     }
 
     public void replace(int id, String json) throws ClientException, ServerException {
-        Optional<E> objForReplace = filter.getElementById(storage.stream(), id);
+        Optional<E> objForReplace = storage.getById(id);
         if (objForReplace.isEmpty()) {
-            throw new ClientException(StatusCode.Not_Found, "Object for replacement hasn't been found");
+            throw new ClientException(StatusCode.NOT_FOUND, "Object for replacement hasn't been found");
         }
         E newObj = itemConverter.parseJson(json);
+        storage.setNewName(objForReplace.get(), newObj.name());
         synchronized (objForReplace.get()) {
             objForReplace.get().copy(newObj);
         }
@@ -114,13 +129,14 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
 
     @Override
     public StatusCode replaceOrAdd(int id, String json) throws ClientException, ServerException {
-        Optional<E> objForReplace = filter.getElementById(storage.stream(), id);
+        Optional<E> objForReplace = storage.getById(id);
         cache.clear();
         if (objForReplace.isEmpty()) {
             add(json);
-            return StatusCode.Created;
+            return StatusCode.CREATED;
         }
         E newObj = itemConverter.parseJson(json);
+        storage.setNewName(objForReplace.get(), newObj.name());
         synchronized (objForReplace.get()) {
             objForReplace.get().copy(newObj);
         }
@@ -131,9 +147,9 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
     public String get(Map<String, List<String>> params) throws ClientException {
         String request = paramsToString(params);
         if (!cache.containsKey(request)) {
-            List<E> list = filter.filterStreamByParams(storage.stream(), params).toList();
+            List<E> list = filter.filterStreamByParams(storage, params).toList();
             if (list.isEmpty()) {
-                throw new ClientException(StatusCode.Not_Found, "Item no found");
+                throw new ClientException(StatusCode.NOT_FOUND, "Item no found");
             }
             String res = itemConverter.convertListToJson(list);
             cache.put(request, res);
@@ -144,14 +160,14 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
 
     @Override
     public void delete(int id) throws ClientException, ServerException {
-        Optional<E> obj = filter.getElementById(storage.stream(), id);
+        Optional<E> obj = storage.getById(id);
         if (obj.isEmpty()) {
-            throw new ClientException(StatusCode.Not_Found, "Object for deleting hasn't been found");
+            throw new ClientException(StatusCode.NOT_FOUND, "Object for deleting hasn't been found");
         }
         cache.clear();
         synchronized (BaseStorage.class) {
             if (!storage.remove(obj.get())) {
-                throw new ClientException(StatusCode.Not_Found, "Object almost has been deleted");
+                throw new ClientException(StatusCode.NOT_FOUND, "Object almost has been deleted");
             }
         }
     }
@@ -165,7 +181,7 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
                 obj.setId(id.getAndIncrement());
                 storage.add(obj);
             } else {
-                throw new ClientException(StatusCode.Conflict, "Object already exist in storage");
+                throw new ClientException(StatusCode.CONFLICT, "Object already exist in storage");
             }
         }
     }
@@ -175,7 +191,7 @@ public abstract sealed class BaseStorage<E extends Copyable<E> & Identifiable> i
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile(), false))) {
             writer.write(getFirstLine());
             writer.newLine();
-            for (E elem : storage) {
+            for (E elem : storage.getCollection()) {
                 writer.write(elem.toString());
                 writer.newLine();
             }

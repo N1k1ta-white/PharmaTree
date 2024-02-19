@@ -6,13 +6,13 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.util.StatusCode;
 import java.util.Arrays;
 
 public enum DrugParameters {
-    Id("id"),
-    Name("name"),
-    Company("company"),
-    Country("country"),
-    Properties("properties"),
-    Cost("cost"),
-    Weight("weight");
+    ID("id"),
+    NAME("name"),
+    COMPANY("company"),
+    COUNTRY("country"),
+    PROPERTIES("properties"),
+    COST("cost"),
+    WEIGHT("weight");
 
     private final String name;
 
@@ -28,6 +28,6 @@ public enum DrugParameters {
         return Arrays.stream(DrugParameters.values())
                 .filter(elem -> elem.getValue().equals(str))
                 .findAny()
-                .orElseThrow(() -> new ClientException(StatusCode.Bad_Request, "Incorrect drug parameter"));
+                .orElseThrow(() -> new ClientException(StatusCode.BAD_REQUEST, "Incorrect drug parameter"));
     }
 }

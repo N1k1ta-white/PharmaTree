@@ -38,7 +38,7 @@ public class UserConverter implements ItemConverter<User> {
     public User parseJson(String json) throws ClientException, ServerException {
         User user = GSON.fromJson(JsonParser.parseString(json).getAsJsonObject(), User.class);
         if (user.role() == null || user.name() == null) {
-            throw new ClientException(StatusCode.Bad_Request, "Request hasn't enough data for creating a user");
+            throw new ClientException(StatusCode.BAD_REQUEST, "Request hasn't enough data for creating a user");
         }
         StringBuilder userID = new StringBuilder();
         do {

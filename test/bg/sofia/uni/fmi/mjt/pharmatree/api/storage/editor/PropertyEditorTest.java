@@ -27,9 +27,9 @@ public class PropertyEditorTest {
     void testEditElement() throws ClientException {
         PropertyController.Property test = propExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(PropertyParameters.Name.getValue(), List.of("new_name"));
-        params.put(PropertyParameters.Description.getValue(), List.of("descr"));
-        params.put(PropertyParameters.Allergies.getValue(), List.of("allerg2"));
+        params.put(PropertyParameters.NAME.getValue(), List.of("new_name"));
+        params.put(PropertyParameters.DESCRIPTION.getValue(), List.of("descr"));
+        params.put(PropertyParameters.ALLERGIES.getValue(), List.of("allerg2"));
         editor.editElement(test, params);
         assertEquals(test.name(), "new_name");
         assertEquals(test.description(), "descr");
@@ -40,7 +40,7 @@ public class PropertyEditorTest {
     void testEditElementExceptionNull() throws ClientException {
         PropertyController.Property test = propExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(PropertyParameters.Name.getValue(), null);
+        params.put(PropertyParameters.NAME.getValue(), null);
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
         params.clear();
         params.put(null, List.of("something"));
@@ -52,10 +52,10 @@ public class PropertyEditorTest {
     void testEditElementExceptionInvalidArgs() throws ClientException {
         PropertyController.Property test = propExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(PropertyParameters.Name.getValue() + "p", List.of("test"));
+        params.put(PropertyParameters.NAME.getValue() + "p", List.of("test"));
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
         params.clear();
-        params.put(PropertyParameters.Allergies.name() + "e", List.of("something"));
+        params.put(PropertyParameters.ALLERGIES.name() + "e", List.of("something"));
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
     }
 
@@ -63,7 +63,7 @@ public class PropertyEditorTest {
     void testEditElementExceptionIdEdit() throws ClientException {
         PropertyController.Property test = propExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(PropertyParameters.Id.getValue(), List.of("test"));
+        params.put(PropertyParameters.ID.getValue(), List.of("test"));
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
     }
 }

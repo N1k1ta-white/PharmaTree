@@ -35,14 +35,14 @@ public class DeleteHandlerTest {
         OutputStream output = Mockito.mock(OutputStream.class);
         when(exchange.getRequestURI()).thenReturn(uri);
         when(uri.getQuery()).thenReturn("id=3");
-        when(uri.getPath()).thenReturn("api/user");
+        when(uri.getPath()).thenReturn("/api/user");
         when(exchange.getResponseBody()).thenReturn(output);
         Handler request = new DeleteHandler();
         String res = "OK";
-        request.execute(exchange, Role.Admin);
+        request.execute(exchange, Role.ADMIN);
         verify(output).write(res.getBytes(StandardCharsets.UTF_8));
         Handler get = new GetHandler();
         when(uri.getQuery()).thenReturn("id=3");
-        assertThrows(ClientException.class, () -> request.execute(exchange, Role.Admin));
+        assertThrows(ClientException.class, () -> request.execute(exchange, Role.ADMIN));
     }
 }

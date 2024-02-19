@@ -4,7 +4,6 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ServerException;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.Role;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.items.user.UserProperty;
-import bg.sofia.uni.fmi.mjt.pharmatree.api.storage.UserStorage;
 import bg.sofia.uni.fmi.mjt.pharmatree.api.testHelper.TestHelper;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -29,17 +28,17 @@ public class AuthenticationTest {
     void testAuth() throws ServerException, ClientException {
         HttpExchange exchange = Mockito.mock(HttpExchange.class);
         HashMap<String, List<String>> param = new HashMap<>();
-        param.put(UserProperty.UserId.getValue(), List.of("admin"));
+        param.put(UserProperty.USER_ID.getValue(), List.of("admin"));
         Headers headers = new Headers(param);
         Mockito.when(exchange.getRequestHeaders()).thenReturn(headers);
-        assertEquals(Role.Admin, Authentication.auth(exchange));
+        assertEquals(Role.ADMIN, Authentication.auth(exchange));
     }
 
     @Test
     void testAuthMultiplyId() {
         HttpExchange exchange = Mockito.mock(HttpExchange.class);
         HashMap<String, List<String>> param = new HashMap<>();
-        param.put(UserProperty.UserId.getValue(), List.of("admin", "skdmd"));
+        param.put(UserProperty.USER_ID.getValue(), List.of("admin", "skdmd"));
         Headers headers = new Headers(param);
         Mockito.when(exchange.getRequestHeaders()).thenReturn(headers);
         assertThrows(ClientException.class, () -> Authentication.auth(exchange));
@@ -51,16 +50,16 @@ public class AuthenticationTest {
         HashMap<String, List<String>> param = new HashMap<>();
         Headers headers = new Headers(param);
         Mockito.when(exchange.getRequestHeaders()).thenReturn(headers);
-        assertEquals(Role.Unregistered, Authentication.auth(exchange));
+        assertEquals(Role.UNREGISTERED, Authentication.auth(exchange));
     }
 
     @Test
     void testAuthUnregisteredNull() throws ServerException, ClientException {
         HttpExchange exchange = Mockito.mock(HttpExchange.class);
         HashMap<String, List<String>> param = new HashMap<>();
-        param.put(UserProperty.UserId.getValue(), List.of());
+        param.put(UserProperty.USER_ID.getValue(), List.of());
         Headers headers = new Headers(param);
         Mockito.when(exchange.getRequestHeaders()).thenReturn(headers);
-        assertEquals(Role.Unregistered, Authentication.auth(exchange));
+        assertEquals(Role.UNREGISTERED, Authentication.auth(exchange));
     }
 }

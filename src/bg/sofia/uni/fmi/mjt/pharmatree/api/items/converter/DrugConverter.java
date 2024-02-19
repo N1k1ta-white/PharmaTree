@@ -39,10 +39,10 @@ public class DrugConverter implements ItemConverter<Drug> {
     public Drug parseJson(String json) throws ClientException {
         Drug drug = GSON.fromJson(JsonParser.parseString(json).getAsJsonObject(), Drug.class);
         if (drug.properties().isEmpty()) {
-            throw new ClientException(StatusCode.Bad_Request, "New drug hasn't properties which exist in Database");
+            throw new ClientException(StatusCode.BAD_REQUEST, "New drug hasn't properties which exist in Database");
         } else if (drug.name().isBlank() || drug.cost() == 0 || drug.company().isBlank() || drug.country().isBlank()
                     || drug.weight() == 0) {
-            throw new ClientException(StatusCode.Bad_Request, "Not enough data for creating a object");
+            throw new ClientException(StatusCode.BAD_REQUEST, "Not enough data for creating a object");
         }
         return drug;
     }

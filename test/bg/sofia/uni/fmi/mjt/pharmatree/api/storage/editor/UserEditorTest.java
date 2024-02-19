@@ -21,19 +21,19 @@ public class UserEditorTest {
     @BeforeAll
     static void beforeAll() {
         editor = new UserEditor();
-        userExample = new User(7, "John", Role.Registered, "324324324sfsf");
+        userExample = new User(7, "John", Role.REGISTERED, "324324324sfsf");
     }
 
     @Test
     void testEditElement() throws ClientException {
         User test = userExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(UserProperty.Name.getValue(), List.of("new_name"));
-        params.put(UserProperty.Role.getValue(), List.of("admin"));
-        params.put(UserProperty.UserId.getValue(), List.of("qwerty"));
+        params.put(UserProperty.NAME.getValue(), List.of("new_name"));
+        params.put(UserProperty.ROLE.getValue(), List.of("admin"));
+        params.put(UserProperty.USER_ID.getValue(), List.of("qwerty"));
         editor.editElement(test, params);
         assertEquals(test.name(), "new_name");
-        assertEquals(test.role(), Role.Admin);
+        assertEquals(test.role(), Role.ADMIN);
         assertEquals(test.userId(), "qwerty");
     }
 
@@ -41,7 +41,7 @@ public class UserEditorTest {
     void testEditElementExceptionNull() throws ClientException {
         User test = userExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(UserProperty.Name.getValue(), null);
+        params.put(UserProperty.NAME.getValue(), null);
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
         params.clear();
         params.put(null, List.of("something"));
@@ -54,10 +54,10 @@ public class UserEditorTest {
     void testEditElementExceptionInvalidArgs() throws ClientException {
         User test = userExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(UserProperty.Name.getValue() + "p", List.of("test"));
+        params.put(UserProperty.NAME.getValue() + "p", List.of("test"));
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
         params.clear();
-        params.put(UserProperty.Role.getValue() + "e", List.of("something"));
+        params.put(UserProperty.ROLE.getValue() + "e", List.of("something"));
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
     }
 
@@ -65,7 +65,7 @@ public class UserEditorTest {
     void testEditElementExceptionIdEdit() throws ClientException {
         User test = userExample;
         Map<String, List<String>> params = new HashMap<>();
-        params.put(UserProperty.Id.getValue(), List.of("test"));
+        params.put(UserProperty.ID.getValue(), List.of("test"));
         assertThrows(ClientException.class, () -> editor.editElement(test, params));
     }
 }

@@ -10,16 +10,16 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public interface Handler {
-    int POS_OF_TYPE = 1;
-    int COUNT_OF_PARTS = 2;
+    int POS_OF_TYPE = 2;
+    int COUNT_OF_PARTS = 3;
     String SEPARATOR = "/";
     String ROOT = "api";
 
     static String getType(HttpExchange exchange) throws ClientException {
         String path = exchange.getRequestURI().getPath();
         String[] arr = path.split(SEPARATOR, COUNT_OF_PARTS);
-        if (!arr[0].equals(ROOT)) {
-            throw new ClientException(StatusCode.Not_Found, "Unknown URI path");
+        if (arr.length != COUNT_OF_PARTS || !arr[1].equals(ROOT)) {
+            throw new ClientException(StatusCode.NOT_FOUND, "Unknown URI path");
         }
         return arr[POS_OF_TYPE];
     }

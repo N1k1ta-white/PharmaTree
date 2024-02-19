@@ -15,7 +15,7 @@ public abstract class BaseEditor<E> implements Editor<E> {
     private boolean isValidNumberOfValues(Map<String, List<String>> params) throws ClientException {
         for (Map.Entry<String, List<String>> param : params.entrySet()) {
             if (param.getValue() == null || param.getKey() == null) {
-                throw new ClientException(StatusCode.Bad_Request, "Null parameter");
+                throw new ClientException(StatusCode.BAD_REQUEST, "Null parameter");
             }
             boolean curr = isValidNumberOfValue(param.getKey(), param.getValue().size());
             if (!curr) {
@@ -28,16 +28,16 @@ public abstract class BaseEditor<E> implements Editor<E> {
     @Override
     public void editElement(E element, Map<String, List<String>> params) throws ClientException {
         if (params == null) {
-            throw new ClientException(StatusCode.Bad_Request, "Null parameters");
+            throw new ClientException(StatusCode.BAD_REQUEST, "Null parameters");
         } else if (element == null) {
-            throw new ClientException(StatusCode.Bad_Request, "Empty object");
+            throw new ClientException(StatusCode.BAD_REQUEST, "Empty object");
         }
         if (isValidNumberOfValues(params)) {
             for (Map.Entry<String, List<String>> param : params.entrySet()) {
                 edit(element, param.getKey(), param.getValue());
             }
         } else {
-            throw new ClientException(StatusCode.Bad_Request, "Invalid number of values of parameters");
+            throw new ClientException(StatusCode.BAD_REQUEST, "Invalid number of values of parameters");
         }
     }
 }

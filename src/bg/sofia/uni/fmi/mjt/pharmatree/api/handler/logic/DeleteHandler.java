@@ -21,12 +21,12 @@ public final class DeleteHandler extends HandlerEditor {
             ItemsType type = ItemsType.parseFromString(Handler.getType(exchange));
             Storage storage = StorageFactory.of(type);
             if (auth.getSecurityLevel() < storage.getSecurityLevelEdit()) {
-                throw new ClientException(StatusCode.Forbidden, "You haven't required access level(delete)!");
+                throw new ClientException(StatusCode.FORBIDDEN, "You haven't required access level(delete)!");
             }
             storage.delete(Integer.parseInt(params.get(QUERY_ID).getFirst()));
             Handler.writeResponse(exchange, StatusCode.OK);
         } catch (IOException e) {
-            throw new ServerException(StatusCode.Internal_Server_Error,
+            throw new ServerException(StatusCode.INTERNAL_SERVER_ERROR,
                     "Unexpected error in server during writing response (delete)", e);
         }
     }

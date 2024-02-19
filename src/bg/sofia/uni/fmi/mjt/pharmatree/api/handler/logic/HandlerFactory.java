@@ -5,11 +5,11 @@ import bg.sofia.uni.fmi.mjt.pharmatree.api.exception.ClientException;
 public class HandlerFactory {
     public static Handler of(String method) throws ClientException {
         return switch (TypeHandler.parseMethodType(method)) {
-            case Get -> new GetHandler();
-            case Post -> new PostHandler();
-            case Put -> new PutHandler();
-            case Delete -> new DeleteHandler();
-            case Patch -> new PatchHandler();
+            case GET -> new GetHandler();
+            case POST -> new PostHandler();
+            case PUT -> new PutHandler();
+            case DELETE -> new DeleteHandler();
+            case PATCH -> new PatchHandler();
         };
     }
 }

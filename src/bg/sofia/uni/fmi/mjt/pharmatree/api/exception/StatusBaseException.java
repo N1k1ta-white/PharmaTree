@@ -18,8 +18,8 @@ public class StatusBaseException extends Exception {
     }
 
     public String getJsonMessage() {
-        return "{" + System.lineSeparator() + "\"error\":\"error\"" + System.lineSeparator()
-                + "\"message\":\"" + description + "\"" + System.lineSeparator() + "}";
+        return "{" + System.lineSeparator() + "\t\"error\":\"error\"" + System.lineSeparator()
+                + "\t\"message\":\"" + description + "\"" + System.lineSeparator() + "}";
     }
 
     public StatusCode getCode() {
